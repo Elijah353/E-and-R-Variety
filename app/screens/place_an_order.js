@@ -18,6 +18,9 @@ const PlaceOrder = () => {
 
     const setupDatabase = async () => {
         const db = await SQLite.openDatabaseAsync("mobileApps.db");
+        // await db.runAsync(
+        //     `DROP TABLE IF EXISTS orders`
+        // )
         await db.runAsync(`
             CREATE TABLE IF NOT EXISTS orders (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,6 +31,9 @@ const PlaceOrder = () => {
             )
         `);
 
+        // await db.runAsync(
+        //     `DROP TABLE IF EXISTS order_items`
+        // )
         await db.runAsync(`
             CREATE TABLE IF NOT EXISTS order_items (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,7 +51,7 @@ const PlaceOrder = () => {
         try {
             const db = await SQLite.openDatabaseAsync("mobileApps.db");
             const allRows = await db.getAllAsync("SELECT * FROM customers");
-            setProducts(allRows);
+            setCustomers(allRows);
         } catch (e) {
             console.log('Error fetching customers:', e);
         }
@@ -93,20 +99,20 @@ const PlaceOrder = () => {
             await db.runAsync(
                 "INSERT INTO orders (customer_id, total_price) VALUES (?, ?)",
                 [selectedCustomer, totalPrice],
-                (_, result) => {
-                    const orderId = result.insertId;
-                    selectedProducts.forEach(product => {
-                        db.runAsync(
-                            "INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)",
-                            [orderId, product.id, 1]
-                        );
-                    });
-                    Alert.alert("Order saved successfully!");
-                    setSelectedCustomer(null);
-                    setSelectedProducts([]);
-                    setTotalPrice(0);
+                );
+                // Get the last inserted order id
+                const orderIdResult = await db.getFirstAsync("SELECT last_insert_rowid() as id");
+                const orderId = orderIdResult.id;
+                for (const product of selectedProducts) {
+                    await db.runAsync(
+                        "INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)",
+                        [orderId, product.id, 1]
+                    );
                 }
-            );
+                Alert.alert("Order saved successfully!");
+                setSelectedCustomer(null);
+                setSelectedProducts([]);
+                setTotalPrice(0);
         } catch (e) {
             console.log('Error saving order:', e);
             Alert.alert("Error saving order");
@@ -168,7 +174,7 @@ const PlaceOrder = () => {
             {/* Save and Cancel Buttons */}
             <View style={{ marginTop: 20 }}>
                 <Button title="Save Order" onPress={saveOrder} />
-                <Button title="Cancel" color="red" onPress={() => setSelectedProducts([])} />
+                <Button title="Cancel" color="red"  onPress={() => {setSelectedCustomer(null); setSelectedProducts([]); setTotalPrice(0);}} />
             </View>
         </SafeAreaView>
     );
