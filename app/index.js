@@ -20,7 +20,7 @@ const Welcome = () => {
           onPress={() => router.push('/register/register')}
           activeOpacity={0.8}
         >
-          <Text style={styles.buttonText}>Register Now</Text>
+          <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 6,
   },
   button: {
-    backgroundColor: '#ff6f61', // coral/red-orange
+    backgroundColor: '#1C1C1C', 
     paddingVertical: 15,
     paddingHorizontal: 50,
     borderRadius: 30,
