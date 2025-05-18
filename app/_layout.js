@@ -25,12 +25,17 @@ export default () => {
                 <FontAwesome name="shopping-cart" size={24} color={color} />,
             title: 'Products',
         }} />
-        <Tabs.Screen name="extra" options={{
+        <Tabs.Screen name="customers" options={{
+            tabBarIcon: ({ color }) =>
+                <FontAwesome name="users" size={24} color={color} />,
+            title: 'Customers',
+        }} />
+        {/* <Tabs.Screen name="extra" options={{
             tabBarIcon: ({ color }) =>
                 <FontAwesome name="briefcase" size={24} color={color} />,
             title: 'Extra',
             headerShown: false
-        }} />
+        }} /> */}
         <Tabs.Screen name="store" options={{
             tabBarIcon: ({ color }) =>
                 <FontAwesome name="server" size={24} color={color} />,

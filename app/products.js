@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
 
-const ProductListScreen = () => {
+const products = () => {
     const [products, setProducts] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
@@ -220,6 +220,7 @@ const ProductListScreen = () => {
         </GestureHandlerRootView>
     );
 };
+export default products;
 
 const styles = StyleSheet.create({
     container: {
@@ -304,4 +305,3 @@ const styles = StyleSheet.create({
         height: '100%',
     },
 });
-export default ProductListScreen;
