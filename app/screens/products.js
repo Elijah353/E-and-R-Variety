@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, StyleSheet, FlatList, View, Image, SafeAreaView, Button, TextInput, Alert, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, FlatList, View, Image, SafeAreaView, Button, TextInput, Alert, TouchableOpacity, RefreshControl } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import * as ImagePicker from 'expo-image-picker';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
@@ -13,6 +13,18 @@ const products = () => {
     const [productPrice, setProductPrice] = useState('');
     const [productImage, setProductImage] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
+
+    // Refresh handler
+    const onRefresh = () => {
+        setRefreshing(true);
+        // Simulate a network request
+        setTimeout(() => {
+            // Add your logic to refresh products here
+            fetchProducts();  // Example: Fetching the latest products
+            setRefreshing(false);
+        }, 1000);
+    };
 
     useEffect(() => {
         setupDatabase().then(fetchProducts);
@@ -215,13 +227,28 @@ const products = () => {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
-                <FlatList data={products} keyExtractor={item => item.id.toString()} renderItem={renderItem} />
-                <TouchableOpacity style={styles.squareButton} onPress={() => { resetForm(); setShowAddForm(true); }}>
+                <FlatList
+                    data={products}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={renderItem}
+                    // Add Pull-to-Refresh
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />
+                    }
+                />
+                <TouchableOpacity
+                    style={styles.squareButton}
+                    onPress={() => { resetForm(); setShowAddForm(true); }}
+                >
                     <Text style={styles.squareButtonText}>+</Text>
                 </TouchableOpacity>
             </SafeAreaView>
         </GestureHandlerRootView>
     );
+
 };
 export default products;
 

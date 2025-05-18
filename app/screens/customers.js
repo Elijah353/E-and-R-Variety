@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, StyleSheet, FlatList, View, SafeAreaView, Button, TextInput, Alert, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, FlatList, View, SafeAreaView, Button, TextInput, Alert, TouchableOpacity, RefreshControl } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -12,6 +12,18 @@ const customers = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
+
+    // Refresh handler
+    const onRefresh = () => {
+        setRefreshing(true);
+        // Simulate a network request
+        setTimeout(() => {
+            // Add your logic to refresh products here
+            fetchCustomers();
+            setRefreshing(false);
+        }, 1000);
+    };
 
     useEffect(() => {
         setupDatabase().then(fetchCustomers);
@@ -188,7 +200,15 @@ const customers = () => {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
-                <FlatList data={customers} keyExtractor={item => item.id.toString()} renderItem={renderItem} />
+                <FlatList data={customers}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={renderItem}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />
+                    } />
                 <TouchableOpacity style={styles.squareButton} onPress={() => { resetForm(); setShowAddForm(true); }}>
                     <Text style={styles.squareButtonText}>+</Text>
                 </TouchableOpacity>

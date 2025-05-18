@@ -15,14 +15,9 @@ export default () => {
         },
         tabBarActiveTintColor: 'blue',
     }}>
-        {/* <Tabs.Screen name="index" options={{
-            tabBarIcon: ({ color }) =>
-                <FontAwesome name="home" size={24} color={color} />,
-            title: 'Home',
-        }} /> */}
         <Tabs.Screen name="products" options={{
             tabBarIcon: ({ color }) =>
-                <FontAwesome name="shopping-cart" size={24} color={color} />,
+                <FontAwesome name="tags" size={24} color={color} />,
             title: 'Products',
         }} />
         <Tabs.Screen name="customers" options={{
@@ -35,26 +30,10 @@ export default () => {
                 <FontAwesome name="shopping-cart" size={24} color={color} />,
             title: 'Place Order',
         }} />
-         <Tabs.Screen name="orderSummary" options={{
+        <Tabs.Screen name="orderSummary" options={{
             tabBarIcon: ({ color }) =>
-                <FontAwesome name="home" size={24} color={color} />,
+                <FontAwesome name="history" size={24} color={color} />,
             title: 'Order Summary',
         }} />
-        {/* <Tabs.Screen name="extra" options={{
-            tabBarIcon: ({ color }) =>
-                <FontAwesome name="briefcase" size={24} color={color} />,
-            title: 'Extra',
-            headerShown: false
-        }} /> */}
-        {/* <Tabs.Screen name="store" options={{
-            tabBarIcon: ({ color }) =>
-                <FontAwesome name="server" size={24} color={color} />,
-            title: 'AsyncStorage',
-        }} />
-        <Tabs.Screen name="sqlite" options={{
-            tabBarIcon: ({ color }) =>
-                <FontAwesome name="gear" size={24} color={color} />,
-            title: 'SQLite',
-        }} /> */}
     </Tabs>
 } 

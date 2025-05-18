@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, SafeAreaView, Alert, RefreshControl } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 
 const OrderSummary = () => {
     const [orders, setOrders] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [orderDetails, setOrderDetails] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+
+    // Refresh handler
+    const onRefresh = () => {
+        setRefreshing(true);
+        // Simulate a network request
+        setTimeout(() => {
+            // Add your logic to refresh products here
+            fetchOrders();  // Example: Fetching the latest products
+            setRefreshing(false);
+        }, 1000);
+    };
 
     useEffect(() => {
         fetchOrders();
@@ -92,6 +104,12 @@ const OrderSummary = () => {
                     data={orders}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={renderOrder}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={onRefresh}
+                        />
+                    }
                     ListEmptyComponent={<Text>No orders found.</Text>}
                 />
             )}

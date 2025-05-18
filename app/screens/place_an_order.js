@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Button, TextInput, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, Button, TextInput, TouchableOpacity, Alert, SafeAreaView, RefreshControl } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { Picker } from '@react-native-picker/picker';
 
@@ -9,6 +9,19 @@ const PlaceOrder = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [refreshing, setRefreshing] = useState(false);
+
+    // Refresh handler
+    const onRefresh = () => {
+        setRefreshing(true);
+        // Simulate a network request
+        setTimeout(() => {
+            // Add your logic to refresh products here
+            fetchCustomers();
+            fetchProducts();  // Example: Fetching the latest products
+            setRefreshing(false);
+        }, 1000);
+    };
 
     useEffect(() => {
         setupDatabase();
@@ -99,20 +112,20 @@ const PlaceOrder = () => {
             await db.runAsync(
                 "INSERT INTO orders (customer_id, total_price) VALUES (?, ?)",
                 [selectedCustomer, totalPrice],
+            );
+            // Get the last inserted order id
+            const orderIdResult = await db.getFirstAsync("SELECT last_insert_rowid() as id");
+            const orderId = orderIdResult.id;
+            for (const product of selectedProducts) {
+                await db.runAsync(
+                    "INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)",
+                    [orderId, product.id, 1]
                 );
-                // Get the last inserted order id
-                const orderIdResult = await db.getFirstAsync("SELECT last_insert_rowid() as id");
-                const orderId = orderIdResult.id;
-                for (const product of selectedProducts) {
-                    await db.runAsync(
-                        "INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)",
-                        [orderId, product.id, 1]
-                    );
-                }
-                Alert.alert("Order saved successfully!");
-                setSelectedCustomer(null);
-                setSelectedProducts([]);
-                setTotalPrice(0);
+            }
+            Alert.alert("Order saved successfully!");
+            setSelectedCustomer(null);
+            setSelectedProducts([]);
+            setTotalPrice(0);
         } catch (e) {
             console.log('Error saving order:', e);
             Alert.alert("Error saving order");
@@ -154,9 +167,14 @@ const PlaceOrder = () => {
                         onPress={() => addProductToOrder(item)}
                     >
                         <Text>{item.name}</Text>
-                        <Text>${item.price}</Text>
+                        <Text>${parseFloat(item.price).toFixed(2)}</Text>
                     </TouchableOpacity>
                 )}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh} />
+                }
             />
 
             {/* Order Summary */}
@@ -174,7 +192,7 @@ const PlaceOrder = () => {
             {/* Save and Cancel Buttons */}
             <View style={{ marginTop: 20 }}>
                 <Button title="Save Order" onPress={saveOrder} />
-                <Button title="Cancel" color="red"  onPress={() => {setSelectedCustomer(null); setSelectedProducts([]); setTotalPrice(0);}} />
+                <Button title="Cancel" color="red" onPress={() => { setSelectedCustomer(null); setSelectedProducts([]); setTotalPrice(0); }} />
             </View>
         </SafeAreaView>
     );
