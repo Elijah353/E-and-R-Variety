@@ -1,268 +1,306 @@
 import React, { useEffect, useState } from 'react';
-import { Text, StyleSheet, FlatList, View, Image, SafeAreaView, Button, TextInput, Alert, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, View, SafeAreaView, TextInput, Alert, TouchableOpacity, } from 'react-native';
 import * as SQLite from 'expo-sqlite';
-import * as ImagePicker from 'expo-image-picker';
-import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
-import { MaterialIcons } from '@expo/vector-icons';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useRouter } from 'expo-router';
 
-const customers = () => {
-    const [customers, setCustomers] = useState([]);
-    const [showAddForm, setShowAddForm] = useState(false);
-    const [showEditForm, setShowEditForm] = useState(false);
-    const [customerName, setCustomerName] = useState('');
+const Users = () => {
+    const router = useRouter();
+
+    const [activeTab, setActiveTab] = useState('register'); // 'register' or 'login'
+
+    const [name, setName] = useState('');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    // Login form state
+    const [loginUsername, setLoginUsername] = useState('');
+    const [loginPassword, setLoginPassword] = useState('');
 
     useEffect(() => {
-        setupDatabase().then(fetchCustomers);
+        setupDatabase();
     }, []);
 
     const setupDatabase = async () => {
-        const db = await SQLite.openDatabaseAsync("mobileApps.db");
-        // await db.runAsync(
-        //     `DROP TABLE IF EXISTS customers`
-        // )
+        const db = SQLite.openDatabase('mobileApps.db');
+        //await db.runAsync(`DROP TABLE IF EXISTS users`);  // remove for production
         await db.runAsync(
-            `CREATE TABLE IF NOT EXISTS customers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            username TEXT NOT NULL,
-            email TEXT NOT NULL
-        )`
+            `CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                username TEXT NOT NULL,
+                email TEXT NOT NULL,
+                password TEXT NOT NULL
+            )`
         );
     };
 
-    const fetchCustomers = async () => {
-        const db = await SQLite.openDatabaseAsync("mobileApps.db");
-        const allRows = await db.getAllAsync("SELECT * FROM customers");
-        setCustomers(allRows);
-    };
-
-    const addCustomer = async () => {
-        if (customerName && username && email) {
-            try {
-                const db = await SQLite.openDatabaseAsync("mobileApps.db");
-                await db.runAsync(
-                    "INSERT INTO customers (name, username, email) VALUES (?, ?, ?)",
-                    [customerName, username, email]
-                );
-                setCustomerName('');
-                setUsername('');
-                setEmail('');
-                setShowAddForm(false);
-                fetchCustomers();
-                Alert.alert("Customer added!");
-            } catch (e) {
-                console.log('DB error:', e);
-                Alert.alert("Error adding customer", e.message);
-            }
-        } else {
-            Alert.alert("Please enter a customer name, username, and email.");
-        }
-    };
-
-    const updateCustomer = async () => {
-        if (selectedCustomer) {
-            try {
-                const db = await SQLite.openDatabaseAsync("mobileApps.db");
-                await db.runAsync(
-                    "UPDATE customers SET name = ?, username = ?, email = ? WHERE id = ?",
-                    [customerName, username, email, selectedCustomer.id]
-                );
-                setShowEditForm(false);
-                fetchCustomers();
-                Alert.alert("Customer updated!");
-            } catch (e) {
-                Alert.alert("Error updating customer", e.message);
-            }
-        }
-    };
-
-    const deleteCustomer = async (id) => {
-        try {
-            const db = await SQLite.openDatabaseAsync("mobileApps.db");
-            await db.runAsync("DELETE FROM customers WHERE id = ?", [id]);
-            fetchCustomers();
-            Alert.alert("Customer deleted!");
-        } catch (e) {
-            Alert.alert("Error deleting Customer", e.message);
-        }
-    };
-
-    const resetForm = () => {
-        setCustomerName('');
+    const resetRegisterForm = () => {
+        setName('');
         setUsername('');
         setEmail('');
-        setShowAddForm(false);
-        setShowEditForm(false);
-        setSelectedCustomer(null);
+        setPassword('');
+        setConfirmPassword('');
     };
 
-    if (showAddForm) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Full Name"
-                    value={customerName}
-                    onChangeText={setCustomerName}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Username"
-                    value={username}
-                    onChangeText={setUsername}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                />
-                <Button title="Add" onPress={addCustomer} />
-                <Button title="Back to Customers" onPress={() => setShowAddForm(false)} />
-            </SafeAreaView>
-        );
-    }
+    const resetLoginForm = () => {
+        setLoginUsername('');
+        setLoginPassword('');
+    };
 
-    if (showEditForm) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Full Name"
-                    value={customerName}
-                    onChangeText={setCustomerName}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Username"
-                    value={username}
-                    onChangeText={setUsername}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                />
-                <Button title="Update" onPress={updateCustomer} />
-                <Button title="Back to Customers" onPress={() => setShowEditForm(false)} />
-            </SafeAreaView>
-        );
-    }
+    const validateEmail = (email) => {
+        const re = /\S+@\S+\.\S+/;
+        return re.test(email);
+    };
 
-    const renderRightActions = (item) => (
-        <TouchableOpacity
-            style={styles.deleteIconContainer}
-            onPress={() => {
-                Alert.alert("Delete", "Are you sure you want to delete this customer?", [
-                    { text: "Cancel", style: "cancel" },
-                    { text: "Delete", onPress: () => deleteCustomer(item.id), style: "destructive" }
-                ]);
-            }}>
-            <MaterialIcons name="delete" size={28} color="red" />
-        </TouchableOpacity>
-    );
+    const addUser = async () => {
+        if (!name || !username || !email || !password || !confirmPassword) {
+            Alert.alert('Please fill all registration fields.');
+            return;
+        }
 
-    const renderItem = ({ item }) => (
-        <Swipeable renderRightActions={() => renderRightActions(item)}>
-            <TouchableOpacity onPress={() => {
-                setSelectedCustomer(item);
-                setCustomerName(item.name);
-                setUsername(item.username);
-                setEmail(item.email);
-                setShowEditForm(true);
-            }}>
-                <View style={styles.customerContainer}>
-                    <View style={styles.customerDetails}>
-                        <Text style={styles.customerName}>{item.name}</Text>
-                        <Text style={styles.username}>Username: {item.username}</Text>
-                        <Text style={styles.email}>Email: {item.email}</Text>
-                    </View>
-                </View>
-            </TouchableOpacity>
-        </Swipeable>
-    );
+        if (!validateEmail(email)) {
+            Alert.alert('Please enter a valid email address.');
+            return;
+        }
+
+        if (password.length < 6) {
+            Alert.alert('Password must be at least 6 characters.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            Alert.alert('Passwords do not match.');
+            return;
+        }
+
+        try {
+            const db = await SQLite.openDatabaseAsync('mobileApps.db');
+
+            const existingUsers = await db.getAllAsync(
+                'SELECT * FROM users WHERE email = ? OR username = ?',
+                [email, username]
+            );
+
+            if (existingUsers.length > 0) {
+                // Check which field is duplicated
+                const emailExists = existingUsers.some(user => user.email === email);
+                const usernameExists = existingUsers.some(user => user.username === username);
+
+                if (emailExists && usernameExists) {
+                    Alert.alert('This email and username are already registered.');
+                } else if (emailExists) {
+                    Alert.alert('This email is already registered.');
+                } else if (usernameExists) {
+                    Alert.alert('This username is already taken.');
+                }
+                return;
+            }
+
+            await db.runAsync(
+                'INSERT INTO users (name, username, email, password) VALUES (?, ?, ?, ?)',
+                [name, username, email, password]
+            );
+
+            Alert.alert('User registered!');
+            resetRegisterForm();
+            setActiveTab('login');
+        } catch (e) {
+            console.log('DB error:', e);
+            Alert.alert('Error adding user', e.message);
+        }
+    };
+
+    const loginUser = async () => {
+        if (!loginUsername || !loginPassword) {
+            Alert.alert('Please enter username and password.');
+            return;
+        }
+
+        try {
+            const db = await SQLite.openDatabaseAsync('mobileApps.db');
+
+            const result = await db.getAllAsync(
+                'SELECT * FROM users WHERE username = ? AND password = ?',
+                [loginUsername, loginPassword]
+            );
+
+            if (result.length > 0) {
+                Alert.alert('Login successful!', `Welcome back, ${result[0].name}!`);
+                resetLoginForm();
+
+                // Navigate to your desired screen
+                router.push('/screens/products');  // adjust path as needed
+            } else {
+                Alert.alert('Invalid username or password');
+            }
+        } catch (e) {
+            console.log('DB error:', e);
+            Alert.alert('Error logging in', e.message);
+        }
+    };
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
-                <FlatList data={customers} keyExtractor={item => item.id.toString()} renderItem={renderItem} />
-                <TouchableOpacity style={styles.squareButton} onPress={() => { resetForm(); setShowAddForm(true); }}>
-                    <Text style={styles.squareButtonText}>+</Text>
-                </TouchableOpacity>
+                <View style={styles.tabsContainer}>
+                    <TouchableOpacity
+                        style={[styles.tab, activeTab === 'register' && styles.activeTab]}
+                        onPress={() => setActiveTab('register')}
+                    >
+                        <Text style={[styles.tabText, activeTab === 'register' && styles.activeTabText]}>
+                            Register
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.tab, activeTab === 'login' && styles.activeTab]}
+                        onPress={() => setActiveTab('login')}
+                    >
+                        <Text style={[styles.tabText, activeTab === 'login' && styles.activeTabText]}>
+                            Login
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
+                {activeTab === 'register' ? (
+                    <View style={styles.formContainer}>
+                        <TextInput
+                            placeholder="Full Name"
+                            style={styles.input}
+                            value={name}
+                            onChangeText={setName}
+                            placeholderTextColor="#999"
+                        />
+                        <TextInput
+                            placeholder="Username"
+                            style={styles.input}
+                            value={username}
+                            onChangeText={setUsername}
+                            placeholderTextColor="#999"
+                        />
+                        <TextInput
+                            placeholder="Email"
+                            style={styles.input}
+                            value={email}
+                            onChangeText={setEmail}
+                            keyboardType="email-address"
+                            placeholderTextColor="#999"
+                        />
+                        <TextInput
+                            placeholder="Password"
+                            secureTextEntry
+                            style={styles.input}
+                            value={password}
+                            onChangeText={setPassword}
+                            placeholderTextColor="#999"
+                        />
+                        <TextInput
+                            placeholder="Confirm Password"
+                            secureTextEntry
+                            style={styles.input}
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
+                            placeholderTextColor="#999"
+                        />
+
+                        <TouchableOpacity style={styles.registerButton} onPress={addUser}>
+                            <Text style={styles.registerButtonText}>Register</Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <View style={styles.formContainer}>
+                        <TextInput
+                            placeholder="Username"
+                            style={styles.input}
+                            value={loginUsername}
+                            onChangeText={setLoginUsername}
+                            placeholderTextColor="#999"
+                        />
+                        <TextInput
+                            placeholder="Password"
+                            secureTextEntry
+                            style={styles.input}
+                            value={loginPassword}
+                            onChangeText={setLoginPassword}
+                            placeholderTextColor="#999"
+                        />
+                        <TouchableOpacity style={styles.registerButton} onPress={loginUser}>
+                            <Text style={styles.registerButtonText}>Login</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </SafeAreaView>
         </GestureHandlerRootView>
     );
 };
-export default customers;
+
+export default Users;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 10,
+        backgroundColor: '#f2f2f2',
+        paddingHorizontal: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    tabsContainer: {
+        flexDirection: 'row',
+        marginBottom: 30,
+        justifyContent: 'center',
+        width: 320,
+    },
+    tab: {
+        flex: 1,
+        paddingVertical: 12,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        marginHorizontal: 5,
+        alignItems: 'center',
+        elevation: 2,
+    },
+    activeTab: {
+        backgroundColor: '#007AFF',
+    },
+    tabText: {
+        color: '#007AFF',
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    activeTabText: {
+        color: 'white',
+    },
+    formContainer: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 4,
+        width: 320,
     },
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 10,
-        marginBottom: 10,
-    },
-    customerContainer: {
-        flexDirection: 'row',
-        backgroundColor: 'white',
-        padding: 10,
-        borderRadius: 5,
-        marginBottom: 10,
-    },
-    customerDetails: {
-        flex: 1,
-        marginLeft: 10,
-        justifyContent: 'center',
-    },
-    customerName: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 4,
-    },
-    username: {
+        borderRadius: 8,
+        padding: 12,
+        marginBottom: 15,
         fontSize: 16,
-        color: '#007AFF',
-        marginBottom: 2,
+        color: '#333',
     },
-    email: {
-        fontSize: 14,
-        color: '#777',
-    },
-    squareButton: {
-        position: 'absolute',
-        bottom: 30,
-        right: 30, // <-- Move button to the right
-        width: 60,
-        height: 60,
+    registerButton: {
         backgroundColor: '#007AFF',
-        justifyContent: 'center',
+        padding: 15,
+        borderRadius: 8,
         alignItems: 'center',
-        borderRadius: 12,
-        elevation: 4, // for Android shadow
-        shadowColor: '#000', // for iOS shadow
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
     },
-    squareButtonText: {
+    registerButtonText: {
         color: 'white',
-        fontSize: 32,
+        fontSize: 16,
         fontWeight: 'bold',
-    },
-    deleteIconContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 80,
-        height: '100%',
     },
 });
