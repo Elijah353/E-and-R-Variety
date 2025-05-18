@@ -35,6 +35,11 @@ export default () => {
                 <FontAwesome name="shopping-cart" size={24} color={color} />,
             title: 'Place Order',
         }} />
+         <Tabs.Screen name="orderSummary" options={{
+            tabBarIcon: ({ color }) =>
+                <FontAwesome name="home" size={24} color={color} />,
+            title: 'Order Summary',
+        }} />
         {/* <Tabs.Screen name="extra" options={{
             tabBarIcon: ({ color }) =>
                 <FontAwesome name="briefcase" size={24} color={color} />,
