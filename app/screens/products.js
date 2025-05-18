@@ -4,6 +4,10 @@ import * as SQLite from 'expo-sqlite';
 import * as ImagePicker from 'expo-image-picker';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useRouter } from 'expo-router'; // if using expo-router
+
+
 
 const products = () => {
     const [products, setProducts] = useState([]);
@@ -14,6 +18,27 @@ const products = () => {
     const [productImage, setProductImage] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
+    const handleLogout = () => {
+        Alert.alert("Logout", "Are you sure you want to logout?", [
+            { text: "Cancel", style: "cancel" },
+            {
+                text: "Logout",
+                style: "destructive",
+                onPress: () => router.replace('/'), // assuming '/' is your login or welcome screen
+            }
+        ]);
+    };
+    const router = useRouter();
+
+    // useEffect(() => {
+    //     const logoutTimer = setTimeout(() => {
+    //         alert("You have been logged out due to inactivity.");
+    //         router.replace('/register/register'); // change this to your actual login screen path
+    //     }, 10000); // 10 seconds = 10000 ms
+
+    //     return () => clearTimeout(logoutTimer); // clean up
+    // }, []);
+
 
     // Refresh handler
     const onRefresh = () => {
@@ -227,6 +252,8 @@ const products = () => {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
+                
+
                 <FlatList
                     data={products}
                     keyExtractor={(item) => item.id.toString()}
@@ -239,12 +266,20 @@ const products = () => {
                         />
                     }
                 />
+
                 <TouchableOpacity
                     style={styles.squareButton}
                     onPress={() => { resetForm(); setShowAddForm(true); }}
                 >
                     <Text style={styles.squareButtonText}>+</Text>
                 </TouchableOpacity>
+                {/* Logout button fixed at bottom left */}
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={handleLogout}
+        >
+          <MaterialIcons name="logout" size={28} color="#007AFF" />
+        </TouchableOpacity>
             </SafeAreaView>
         </GestureHandlerRootView>
     );
@@ -333,5 +368,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: 80,
         height: '100%',
-    },
+    },logoutButton: {
+    position: 'absolute',
+    bottom: 30,
+    left: 30,
+    width: 60,            // same as squareButton
+    height: 60,           // same as squareButton
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,     // same as squareButton
+    elevation: 4,         // shadow Android
+    shadowColor: '#000',  // shadow iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+},
+
 });
