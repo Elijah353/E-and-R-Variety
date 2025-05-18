@@ -15,7 +15,13 @@ const Welcome = () => {
       <View style={styles.container}>
         <Text style={styles.title}>Welcome to E & R Varity</Text>
 
-        <Button title="Register" onPress={() => router.push('/register/register')}/>
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={() => router.push('/register/register')}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.buttonText}>Register Now</Text>
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
