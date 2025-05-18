@@ -22,7 +22,7 @@ export default () => {
         }} />
         <Tabs.Screen name="products" options={{
             tabBarIcon: ({ color }) =>
-                <FontAwesome name="home" size={24} color={color} />,
+                <FontAwesome name="shopping-cart" size={24} color={color} />,
             title: 'Products',
         }} />
         <Tabs.Screen name="extra" options={{
