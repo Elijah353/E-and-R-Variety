@@ -162,6 +162,14 @@ const ProductListScreen = () => {
                     onChangeText={setProductPrice}
                     keyboardType="numeric"
                 />
+                <TouchableOpacity style={styles.imagePickerButton} onPress={pickImage}>
+                    <Text style={styles.imagePickerButtonText}>
+                        {productImage ? 'Change Image' : 'Pick Image'}
+                    </Text>
+                </TouchableOpacity>
+                {productImage ? (
+                    <Image source={{ uri: productImage }} style={styles.previewImage} />
+                ) : null}
                 <Button title="Update" onPress={updateProduct} />
                 <Button title="Back to Products" onPress={() => setShowEditForm(false)} />
             </SafeAreaView>
