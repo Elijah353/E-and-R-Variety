@@ -15,11 +15,11 @@ export default () => {
         },
         tabBarActiveTintColor: 'blue',
     }}>
-        <Tabs.Screen name="index" options={{
+        {/* <Tabs.Screen name="index" options={{
             tabBarIcon: ({ color }) =>
                 <FontAwesome name="home" size={24} color={color} />,
             title: 'Home',
-        }} />
+        }} /> */}
         <Tabs.Screen name="products" options={{
             tabBarIcon: ({ color }) =>
                 <FontAwesome name="shopping-cart" size={24} color={color} />,

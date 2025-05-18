@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Text, StyleSheet, FlatList, View, Image, SafeAreaView, Button, TextInput, Alert, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, FlatList, View, SafeAreaView, Button, TextInput, Alert, TouchableOpacity } from 'react-native';
 import * as SQLite from 'expo-sqlite';
-import * as ImagePicker from 'expo-image-picker';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
 
