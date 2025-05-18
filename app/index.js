@@ -13,7 +13,7 @@ const Welcome = () => {
       <View style={styles.container}>
         <Text style={styles.title}>Welcome to E & R Varity</Text>
 
-        <Button title="Register" onPress={() => router.push('/register/register')}/>
+        <Button title="Register" onPress={() => router.push('/Register/register')}/>
       </View>
     </ImageBackground>
   );
