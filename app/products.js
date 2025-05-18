@@ -3,15 +3,15 @@ import { Text, StyleSheet, FlatList, View, Image, SafeAreaView } from 'react-nat
 const products = [
   {
     id: 1, name: '"Atomic Habits" by James Clear ', price: 16.99, image:
-      require('./assets/tochstar.jpg')
+      require('./assets/atomic_habits.jpg')
   },
   {
     id: 2, name: 'Bookmarks (Set of 5)', price: 2.49, image:
-      require('./assets/AllchickenRoti.png.png')
+      require('./assets/bookmarks.jpg')
   },
   {
-    id: 3, name: 'Custom Book Sleeves', price: 9.99, image:
-      require('./assets/ChatGPT Image Apr 30, 2025, 12_50_59 PM.png')
+    id: 3, name: 'Tote Bags with Quotes', price: 12.99, image:
+      require('./assets/tote_bags_with_quotes.jpg')
   },
   // Add more products here
 ];
