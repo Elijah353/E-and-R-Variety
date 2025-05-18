@@ -20,6 +20,9 @@ const products = () => {
 
     const setupDatabase = async () => {
         const db = await SQLite.openDatabaseAsync("mobileApps.db");
+        // await db.runAsync(
+        //     `DROP TABLE IF EXISTS products`
+        // )
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
