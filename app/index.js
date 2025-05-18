@@ -1,5 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React, { useState } from "react";
+import { StyleSheet, Text, View } from 'react-native'
 
 const index = () => {
 
