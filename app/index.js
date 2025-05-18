@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import React, { useState } from "react";
 
-export default function Page() {
+const index = () => {
+
   return (
     <View style={styles.container}>
       <View style={styles.main}>
@@ -11,6 +13,7 @@ export default function Page() {
   );
 }
 
+export default index
 const styles = StyleSheet.create({
   container: {
     flex: 1,
