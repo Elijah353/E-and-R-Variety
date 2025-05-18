@@ -194,7 +194,7 @@ const ProductListScreen = () => {
                     <Image source={{ uri: item.image }} style={styles.productImage} />
                     <View style={styles.productDetails}>
                         <Text style={styles.productName}>{item.name}</Text>
-                        <Text style={styles.productPrice}>${item.price}</Text>
+                        <Text style={styles.productPrice}>${parseFloat(item.price).toFixed(2)}</Text>
                     </View>
                 </View>
             </TouchableOpacity>
