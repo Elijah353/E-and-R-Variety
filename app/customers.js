@@ -20,6 +20,9 @@ const customers = () => {
 
     const setupDatabase = async () => {
         const db = await SQLite.openDatabaseAsync("mobileApps.db");
+        // await db.runAsync(
+        //     `DROP TABLE IF EXISTS customers`
+        // )
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS customers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -172,11 +175,11 @@ const customers = () => {
                 setEmail(item.email);
                 setShowEditForm(true);
             }}>
-                <View style={styles.productContainer}>
-                    <View style={styles.productDetails}>
-                        <Text style={styles.productName}>{item.name}</Text>
-                        <Text style={styles.productPrice}>{item.username}</Text>
-                         <Text style={styles.productPrice}>{item.email}</Text>
+                <View style={styles.customerContainer}>
+                    <View style={styles.customerDetails}>
+                        <Text style={styles.customerName}>{item.name}</Text>
+                        <Text style={styles.username}>Username: {item.username}</Text>
+                        <Text style={styles.email}>Email: {item.email}</Text>
                     </View>
                 </View>
             </TouchableOpacity>
@@ -208,30 +211,32 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 10,
     },
-    productContainer: {
+    customerContainer: {
         flexDirection: 'row',
         backgroundColor: 'white',
         padding: 10,
         borderRadius: 5,
         marginBottom: 10,
     },
-    productImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 5,
-    },
-    productDetails: {
+    customerDetails: {
         flex: 1,
         marginLeft: 10,
         justifyContent: 'center',
     },
-    productName: {
-        fontSize: 18,
+    customerName: {
+        fontSize: 20,
         fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 4,
     },
-    productPrice: {
+    username: {
         fontSize: 16,
-        color: 'green',
+        color: '#007AFF',
+        marginBottom: 2,
+    },
+    email: {
+        fontSize: 14,
+        color: '#777',
     },
     squareButton: {
         position: 'absolute',
@@ -253,24 +258,6 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 32,
         fontWeight: 'bold',
-    },
-    imagePickerButton: {
-        backgroundColor: '#007AFF',
-        padding: 10,
-        borderRadius: 8,
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    imagePickerButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    previewImage: {
-        width: 100,
-        height: 100,
-        borderRadius: 8,
-        alignSelf: 'center',
-        marginBottom: 10,
     },
     deleteIconContainer: {
         justifyContent: 'center',
