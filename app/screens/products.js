@@ -257,7 +257,7 @@ const products = () => {
                         source={
                             item.image
                                 ? { uri: item.image }
-                                : require('../assets/default-product.jpg') // <-- Default image
+                                : require('../assets/default-product.png') // <-- Default image
                         }
                         style={styles.productImage}
                     />
