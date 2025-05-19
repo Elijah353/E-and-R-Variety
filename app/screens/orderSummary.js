@@ -104,6 +104,10 @@ const OrderSummary = () => {
 
     // Fetch all orders
     const fetchOrders = async () => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         try {
             const db = dbRef.current;
             const result = await db.getAllAsync(`
@@ -120,6 +124,10 @@ const OrderSummary = () => {
 
     // Fetch order details (products in the order)
     const fetchOrderDetails = async (orderId) => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         try {
             const db = dbRef.current;
             const result = await db.getAllAsync(`

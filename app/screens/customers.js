@@ -107,12 +107,20 @@ const customers = () => {
     };
 
     const fetchCustomers = async () => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         const db = dbRef.current;
         const allRows = await db.getAllAsync("SELECT * FROM customers");
         setCustomers(allRows);
     };
 
     const addCustomer = async () => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         if (customerName && username && email) {
             try {
                 const db = dbRef.current;
@@ -136,6 +144,10 @@ const customers = () => {
     };
 
     const updateCustomer = async () => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         if (selectedCustomer) {
             try {
                 const db = dbRef.current;
@@ -153,6 +165,10 @@ const customers = () => {
     };
 
     const deleteCustomer = async (id) => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         try {
             const db = dbRef.current;
             await db.runAsync("DELETE FROM customers WHERE id = ?", [id]);

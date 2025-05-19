@@ -105,6 +105,10 @@ const PlaceOrder = () => {
 
     // Fetch customers from the database
     const fetchCustomers = async () => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         try {
             const db = dbRef.current;
             const allRows = await db.getAllAsync("SELECT * FROM customers");
@@ -116,6 +120,10 @@ const PlaceOrder = () => {
 
     // Fetch products from the database
     const fetchProducts = async () => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         try {
             const db = dbRef.current;
             const allRows = await db.getAllAsync("SELECT * FROM products");
@@ -154,6 +162,10 @@ const PlaceOrder = () => {
 
     // Save the order to the database
     const saveOrder = async () => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         if (!selectedCustomer) {
             Alert.alert("Select a customer before saving the order!");
             return;

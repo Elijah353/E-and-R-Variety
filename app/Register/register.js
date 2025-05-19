@@ -44,13 +44,14 @@ const Users = () => {
     const [loginUsername, setLoginUsername] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
 
+    const initialize = async () => {
+        dbRef.current = await SQLite.openDatabaseAsync("mobileApps.db");
+        await setupDatabase();
+        setDbReady(true);
+        checkLogin();
+    };
+
     useEffect(() => {
-        const initialize = async () => {
-            dbRef.current = await SQLite.openDatabaseAsync("mobileApps.db");
-            await setupDatabase();
-            setDbReady(true);
-            checkLogin();
-        };
         initialize();
     }, []);
 

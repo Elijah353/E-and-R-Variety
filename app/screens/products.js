@@ -110,13 +110,21 @@ const products = () => {
     };
 
     const fetchProducts = async () => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         const db = dbRef.current;
         const allRows = await db.getAllAsync("SELECT * FROM products");
         setProducts(allRows);
     };
 
     const addProduct = async () => {
-        if (productName && productPrice) { // Removed productImage check
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
+        if (productName && productPrice) {
             try {
                 const db = dbRef.current;
                 await db.runAsync(
@@ -139,6 +147,10 @@ const products = () => {
     };
 
     const updateProduct = async () => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         if (selectedProduct) {
             try {
                 const db = dbRef.current;
@@ -156,6 +168,10 @@ const products = () => {
     };
 
     const deleteProduct = async (id) => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         try {
             const db = dbRef.current;
             await db.runAsync("DELETE FROM products WHERE id = ?", [id]);
