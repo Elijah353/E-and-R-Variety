@@ -44,6 +44,16 @@ const PlaceOrder = () => {
 
     const setupDatabase = async () => {
         const db = await SQLite.openDatabaseAsync("mobileApps.db");
+
+        await db.runAsync(`
+        CREATE TABLE IF NOT EXISTS customers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            username TEXT NOT NULL,
+            email TEXT NOT NULL
+        )
+    `);
+    
         // await db.runAsync(
         //     `DROP TABLE IF EXISTS orders`
         // )
@@ -254,8 +264,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     orderItem: {
-        flexDirection: 'row', 
-        justifyContent: 'space-between', 
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         marginVertical: 5,
     },
     logoutButton: {
