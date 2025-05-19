@@ -195,9 +195,9 @@ const PlaceOrder = () => {
                     onValueChange={(value) => setSelectedCustomer(value)}
                     style={styles.customerPicker}
                 >
-                    <Picker.Item label="Select a customer" value={null} />
+                    <Picker.Item label="Select a customer" value={null} color="#000" />
                     {customers.map((customer) => (
-                        <Picker.Item key={customer.id} label={customer.name} value={customer.id} />
+                        <Picker.Item key={customer.id} label={customer.name} value={customer.id} color="#333" />
                     ))}
                 </Picker>
 
