@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Button, TextInput, TouchableOpacity, Alert, SafeAreaView, RefreshControl } from 'react-native';
+import { View, Text, FlatList, Button, TextInput, TouchableOpacity, Alert, SafeAreaView, StyleSheet, ImageBackground } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { Picker } from '@react-native-picker/picker';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 const PlaceOrder = () => {
     const [customers, setCustomers] = useState([]);
@@ -9,19 +11,18 @@ const PlaceOrder = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
-    const [refreshing, setRefreshing] = useState(false);
+    const router = useRouter();
 
-    // Refresh handler
-    const onRefresh = () => {
-        setRefreshing(true);
-        // Simulate a network request
-        setTimeout(() => {
-            // Add your logic to refresh products here
-            fetchCustomers();
-            fetchProducts();  // Example: Fetching the latest products
-            setRefreshing(false);
-        }, 1000);
-    };
+    const handleLogout = () => {
+            Alert.alert("Logout", "Are you sure you want to logout?", [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Logout",
+                    style: "destructive",
+                    onPress: () => router.replace('/'), // assuming '/' is your login or welcome screen
+                }
+            ]);
+        };
 
     useEffect(() => {
         setupDatabase();
@@ -83,16 +84,29 @@ const PlaceOrder = () => {
 
     // Add a product to the order
     const addProductToOrder = (product) => {
-        setSelectedProducts([...selectedProducts, product]);
+        const existing = selectedProducts.find(p => p.id === product.id);
+        if (existing) {
+            setSelectedProducts(selectedProducts.map(p =>
+                p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p
+            ));
+        } else {
+            setSelectedProducts([...selectedProducts, { ...product, quantity: 1 }]);
+        }
         setTotalPrice(totalPrice + product.price);
     };
 
     // Remove a product from the order
     const removeProductFromOrder = (productId) => {
-        const updatedProducts = selectedProducts.filter(p => p.id !== productId);
-        const productToRemove = selectedProducts.find(p => p.id === productId);
-        setSelectedProducts(updatedProducts);
-        setTotalPrice(totalPrice - productToRemove.price);
+        const product = selectedProducts.find(p => p.id === productId);
+        if (!product) return;
+        if (product.quantity > 1) {
+            setSelectedProducts(selectedProducts.map(p =>
+                p.id === productId ? { ...p, quantity: p.quantity - 1 } : p
+            ));
+        } else {
+            setSelectedProducts(selectedProducts.filter(p => p.id !== productId));
+        }
+        setTotalPrice(totalPrice - product.price);
     };
 
     // Save the order to the database
@@ -119,7 +133,7 @@ const PlaceOrder = () => {
             for (const product of selectedProducts) {
                 await db.runAsync(
                     "INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)",
-                    [orderId, product.id, 1]
+                    [orderId, product.id, product.quantity]
                 );
             }
             Alert.alert("Order saved successfully!");
@@ -133,6 +147,10 @@ const PlaceOrder = () => {
     };
 
     return (
+        <ImageBackground
+                    source={require('../assets/background5.jpg')} // Update the path to your image
+                    style={styles.background}
+                >
         <SafeAreaView style={{ padding: 20 }}>
             <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Place an Order</Text>
 
@@ -170,18 +188,13 @@ const PlaceOrder = () => {
                         <Text>${parseFloat(item.price).toFixed(2)}</Text>
                     </TouchableOpacity>
                 )}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh} />
-                }
             />
 
             {/* Order Summary */}
             <Text style={{ marginTop: 20, fontWeight: 'bold' }}>Order Summary:</Text>
             {selectedProducts.map((product, index) => (
                 <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 5 }}>
-                    <Text>{product.name}</Text>
+                    <Text>{product.name} x{product.quantity}</Text>
                     <TouchableOpacity onPress={() => removeProductFromOrder(product.id)}>
                         <Text style={{ color: 'red' }}>Remove</Text>
                     </TouchableOpacity>
@@ -194,8 +207,45 @@ const PlaceOrder = () => {
                 <Button title="Save Order" onPress={saveOrder} />
                 <Button title="Cancel" color="red" onPress={() => { setSelectedCustomer(null); setSelectedProducts([]); setTotalPrice(0); }} />
             </View>
+            
         </SafeAreaView>
+        {/* Logout button fixed at bottom left */}
+                            <TouchableOpacity
+                                style={styles.logoutButton}
+                                onPress={handleLogout}
+                            >
+                                <MaterialIcons name="logout" size={28} color="#007AFF" />
+                            </TouchableOpacity>
+        </ImageBackground>
     );
 };
 
 export default PlaceOrder;
+
+const styles = StyleSheet.create({
+    logoutButton: {
+        position: 'absolute',
+        bottom: 30,
+        left: 30,
+        width: 60,            // same as squareButton
+        height: 60,           // same as squareButton
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 12,     // same as squareButton
+        elevation: 4,         // shadow Android
+        shadowColor: '#000',  // shadow iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+    },
+    background: {
+        flex: 1,
+        resizeMode: 'cover',
+    },
+    overlay: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: 20,
+    },
+});

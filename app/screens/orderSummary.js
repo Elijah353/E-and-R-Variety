@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, SafeAreaView, Alert, RefreshControl } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, SafeAreaView, Alert, RefreshControl, StyleSheet, ImageBackground } from 'react-native';
 import * as SQLite from 'expo-sqlite';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 const OrderSummary = () => {
     const [orders, setOrders] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [orderDetails, setOrderDetails] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
+    const router = useRouter();
 
     // Refresh handler
     const onRefresh = () => {
@@ -17,6 +20,17 @@ const OrderSummary = () => {
             fetchOrders();  // Example: Fetching the latest products
             setRefreshing(false);
         }, 1000);
+    };
+
+    const handleLogout = () => {
+        Alert.alert("Logout", "Are you sure you want to logout?", [
+            { text: "Cancel", style: "cancel" },
+            {
+                text: "Logout",
+                style: "destructive",
+                onPress: () => router.replace('/'), // assuming '/' is your login or welcome screen
+            }
+        ]);
     };
 
     useEffect(() => {
@@ -64,15 +78,10 @@ const OrderSummary = () => {
     // Render each order in the list
     const renderOrder = ({ item }) => (
         <TouchableOpacity
-            style={{
-                padding: 15,
-                marginVertical: 5,
-                backgroundColor: '#f5f5f5',
-                borderRadius: 5,
-            }}
+            style={styles.orderItem}
             onPress={() => handleSelectOrder(item)}
         >
-            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.customer_name}</Text>
+            <Text style={styles.customerName}>{item.customer_name}</Text>
             <Text>Total: ${item.total_price.toFixed(2)}</Text>
             <Text>Date: {new Date(item.order_date).toLocaleString()}</Text>
         </TouchableOpacity>
@@ -80,12 +89,14 @@ const OrderSummary = () => {
 
     // Render order details
     const renderOrderDetails = () => (
-        <View style={{ padding: 15 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Order Details:</Text>
+        <View style={styles.orderDetailView}>
+            <Text style={styles.orderDetails}>Order Details:</Text>
             {orderDetails.map((item, index) => (
-                <View key={index} style={{ marginVertical: 5 }}>
-                    <Text>Product: {item.product_name}</Text>
-                    <Text>Quantity: {item.quantity}</Text>
+                <View key={index} style={styles.productRow}>
+                    <Text style={styles.productName}>{item.product_name}</Text>
+                    <View style={styles.quantityBadge}>
+                        <Text style={styles.quantityText}>x{item.quantity}</Text>
+                    </View>
                 </View>
             ))}
             <TouchableOpacity onPress={() => setSelectedOrder(null)}>
@@ -95,26 +106,117 @@ const OrderSummary = () => {
     );
 
     return (
-        <SafeAreaView style={{ padding: 20 }}>
-            <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 15 }}>Order Summary</Text>
-            {selectedOrder ? (
-                renderOrderDetails()
-            ) : (
-                <FlatList
-                    data={orders}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={renderOrder}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                        />
-                    }
-                    ListEmptyComponent={<Text>No orders found.</Text>}
-                />
-            )}
-        </SafeAreaView>
+        <ImageBackground
+            source={require('../assets/background5.jpg')} // Update the path to your image
+            style={styles.background}
+        >
+            <SafeAreaView style={styles.container}>
+                {selectedOrder ? (
+                    renderOrderDetails()
+                ) : (
+                    <FlatList
+                        data={orders}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={renderOrder}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                            />
+                        }
+                        ListEmptyComponent={<Text>No orders found.</Text>}
+                    />
+                )}
+            </SafeAreaView>
+            {/* Logout button fixed at bottom left */}
+            <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={handleLogout}
+            >
+                <MaterialIcons name="logout" size={28} color="#007AFF" />
+            </TouchableOpacity>
+        </ImageBackground>
     );
 };
 
 export default OrderSummary;
+
+const styles = StyleSheet.create({
+    orderItem: {
+        padding: 15,
+        marginVertical: 5,
+        backgroundColor: '#f5f5f5',
+        borderRadius: 5,
+    },
+    customerName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    orderDetailView: {
+        padding: 15,
+    },
+    orderDetails: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    details: {
+        marginVertical: 5,
+    },
+    container: {
+        padding: 20,
+    },
+    productRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginVertical: 8,
+        paddingVertical: 6,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    productName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+        flex: 1,
+    },
+    quantityBadge: {
+        backgroundColor: '#007AFF',
+        borderRadius: 12,
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        marginLeft: 10,
+        minWidth: 36,
+        alignItems: 'center',
+    },
+    quantityText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    logoutButton: {
+        position: 'absolute',
+        bottom: 30,
+        left: 30,
+        width: 60,            // same as squareButton
+        height: 60,           // same as squareButton
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 12,     // same as squareButton
+        elevation: 4,         // shadow Android
+        shadowColor: '#000',  // shadow iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+    },
+    background: {
+        flex: 1,
+        resizeMode: 'cover',
+    },
+    overlay: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: 20,
+    },
+});

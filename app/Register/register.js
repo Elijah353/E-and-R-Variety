@@ -24,8 +24,8 @@ const Users = () => {
     }, []);
 
     const setupDatabase = async () => {
-        const db = SQLite.openDatabase('mobileApps.db');
-        //await db.runAsync(`DROP TABLE IF EXISTS users`);  // remove for production
+        const db = await SQLite.openDatabaseAsync("mobileApps.db");
+        // await db.runAsync(`DROP TABLE IF EXISTS users`);  // remove for production
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -302,5 +302,5 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
-    },
+    },
 });

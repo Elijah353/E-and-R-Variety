@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Text, StyleSheet, FlatList, View, Image, SafeAreaView, Button, TextInput, Alert, TouchableOpacity, RefreshControl } from 'react-native';
+import { Text, StyleSheet, FlatList, View, Image, SafeAreaView, Button, TextInput, Alert, TouchableOpacity, RefreshControl, ImageBackground } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import * as ImagePicker from 'expo-image-picker';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useRouter } from 'expo-router'; // if using expo-router
+import { useRouter } from 'expo-router';
 
 
 
@@ -18,16 +17,6 @@ const products = () => {
     const [productImage, setProductImage] = useState('');
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
-    const handleLogout = () => {
-        Alert.alert("Logout", "Are you sure you want to logout?", [
-            { text: "Cancel", style: "cancel" },
-            {
-                text: "Logout",
-                style: "destructive",
-                onPress: () => router.replace('/'), // assuming '/' is your login or welcome screen
-            }
-        ]);
-    };
     const router = useRouter();
 
     // useEffect(() => {
@@ -49,6 +38,17 @@ const products = () => {
             fetchProducts();  // Example: Fetching the latest products
             setRefreshing(false);
         }, 1000);
+    };
+
+    const handleLogout = () => {
+        Alert.alert("Logout", "Are you sure you want to logout?", [
+            { text: "Cancel", style: "cancel" },
+            {
+                text: "Logout",
+                style: "destructive",
+                onPress: () => router.replace('/'), // assuming '/' is your login or welcome screen
+            }
+        ]);
     };
 
     useEffect(() => {
@@ -251,38 +251,43 @@ const products = () => {
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <SafeAreaView style={styles.container}>
-                
+            <ImageBackground
+                source={require('../assets/background5.jpg')} // Update the path to your image
+                style={styles.background}
+            >
+                <SafeAreaView style={styles.overlay}>
+                    <FlatList
+                        data={products}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={renderItem}
+                        // Add Pull-to-Refresh
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                            />
+                        }
+                    />
 
-                <FlatList
-                    data={products}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={renderItem}
-                    // Add Pull-to-Refresh
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                        />
-                    }
-                />
+                    <TouchableOpacity
+                        style={styles.squareButton}
+                        onPress={() => { resetForm(); setShowAddForm(true); }}
+                    >
+                        <Text style={styles.squareButtonText}>+</Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.squareButton}
-                    onPress={() => { resetForm(); setShowAddForm(true); }}
-                >
-                    <Text style={styles.squareButtonText}>+</Text>
-                </TouchableOpacity>
-                {/* Logout button fixed at bottom left */}
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogout}
-        >
-          <MaterialIcons name="logout" size={28} color="#007AFF" />
-        </TouchableOpacity>
-            </SafeAreaView>
+                    {/* Logout button fixed at bottom left */}
+                    <TouchableOpacity
+                        style={styles.logoutButton}
+                        onPress={handleLogout}
+                    >
+                        <MaterialIcons name="logout" size={28} color="#007AFF" />
+                    </TouchableOpacity>
+                </SafeAreaView>
+            </ImageBackground>
         </GestureHandlerRootView>
     );
+
 
 };
 export default products;
@@ -368,21 +373,31 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: 80,
         height: '100%',
-    },logoutButton: {
-    position: 'absolute',
-    bottom: 30,
-    left: 30,
-    width: 60,            // same as squareButton
-    height: 60,           // same as squareButton
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,     // same as squareButton
-    elevation: 4,         // shadow Android
-    shadowColor: '#000',  // shadow iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-},
+    }, 
+    logoutButton: {
+        position: 'absolute',
+        bottom: 30,
+        left: 30,
+        width: 60,            // same as squareButton
+        height: 60,           // same as squareButton
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 12,     // same as squareButton
+        elevation: 4,         // shadow Android
+        shadowColor: '#000',  // shadow iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+    },
+    background: {
+        flex: 1,
+        resizeMode: 'cover',
+    },
+    overlay: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: 20,
+    },
 
 });
