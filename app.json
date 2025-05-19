@@ -12,6 +12,9 @@
         "projectId": "010f253a-d850-434d-9432-30a135fec2d5"
       }
     },
-    "owner": "elijah1_234"
+    "owner": "elijah1_234",
+    "android": {
+      "package": "com.elijah1_234.eandrvariety"
+    }
   }
 }
