@@ -1,8 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Text, StyleSheet, View, SafeAreaView, TextInput, Alert, TouchableOpacity, } from 'react-native';
+import { Text, StyleSheet, View, SafeAreaView, TextInput, Alert, TouchableOpacity } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+const CustomCheckBox = ({ value, onValueChange }) => (
+    <TouchableOpacity
+        onPress={() => onValueChange(!value)}
+        style={{
+            width: 24,
+            height: 24,
+            borderWidth: 2,
+            borderColor: '#007AFF',
+            borderRadius: 4,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: value ? '#007AFF' : 'white',
+        }}
+    >
+        {value ? (
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>✓</Text>
+        ) : null}
+    </TouchableOpacity>
+);
 
 const Users = () => {
     const router = useRouter();
@@ -14,12 +36,21 @@ const Users = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [rememberMe, setRememberMe] = useState(false);
 
     // Login form state
     const [loginUsername, setLoginUsername] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
 
     useEffect(() => {
+        const checkLogin = async () => {
+            const user = await AsyncStorage.getItem('loggedInUser');
+            if (user) {
+                // Navigate to your main screen
+                router.push('/screens/products');
+            }
+        };
+        checkLogin();
         setupDatabase();
     }, []);
 
@@ -131,6 +162,12 @@ const Users = () => {
                 Alert.alert('Login successful!', `Welcome back, ${result[0].name}!`);
                 resetLoginForm();
 
+                if (rememberMe) {
+                    await AsyncStorage.setItem('loggedInUser', loginUsername);
+                } else {
+                    await AsyncStorage.removeItem('loggedInUser');
+                }
+
                 // Navigate to your desired screen
                 router.push('/screens/products');  // adjust path as needed
             } else {
@@ -226,6 +263,13 @@ const Users = () => {
                             onChangeText={setLoginPassword}
                             placeholderTextColor="#999"
                         />
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
+                            <CustomCheckBox
+                                value={rememberMe}
+                                onValueChange={setRememberMe}
+                            />
+                            <Text style={{ marginLeft: 8 }}>Remember Me</Text>
+                        </View>
                         <TouchableOpacity style={styles.registerButton} onPress={loginUser}>
                             <Text style={styles.registerButtonText}>Login</Text>
                         </TouchableOpacity>
@@ -302,5 +346,5 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
-    },
+    },
 });

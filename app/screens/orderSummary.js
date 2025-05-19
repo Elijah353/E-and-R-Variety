@@ -3,6 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, SafeAreaView, Alert, RefreshCon
 import * as SQLite from 'expo-sqlite';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OrderSummary = () => {
     const [orders, setOrders] = useState([]);
@@ -22,13 +23,16 @@ const OrderSummary = () => {
         }, 1000);
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         Alert.alert("Logout", "Are you sure you want to logout?", [
             { text: "Cancel", style: "cancel" },
             {
                 text: "Logout",
                 style: "destructive",
-                onPress: () => router.replace('/'), // assuming '/' is your login or welcome screen
+                onPress: async () => {
+                    await AsyncStorage.removeItem('loggedInUser');
+                    router.replace('/'); // assuming '/' is your login or welcome screen
+                }
             }
         ]);
     };
@@ -93,10 +97,20 @@ const OrderSummary = () => {
         </TouchableOpacity>
     );
 
-    // Render order details
+    // Render order details with total price
     const renderOrderDetails = () => (
         <View style={styles.orderDetailView}>
             <Text style={styles.orderDetails}>Order Details:</Text>
+            <Text style={styles.detailText}>
+                Customer: {selectedOrder.customer_name}
+            </Text>
+            <Text style={styles.detailText}>
+                Total Price: ${selectedOrder.total_price.toFixed(2)}
+            </Text>
+            <Text style={styles.detailText}>
+                Order Date: {parseSQLiteDateToLocal(selectedOrder.order_date)}
+            </Text>
+
             {orderDetails.map((item, index) => (
                 <View key={index} style={styles.productRow}>
                     <Text style={styles.productName}>{item.product_name}</Text>
@@ -105,11 +119,13 @@ const OrderSummary = () => {
                     </View>
                 </View>
             ))}
+
             <TouchableOpacity onPress={() => setSelectedOrder(null)}>
                 <Text style={{ color: 'blue', marginTop: 10 }}>Back to Orders</Text>
             </TouchableOpacity>
         </View>
     );
+
 
     return (
         <ImageBackground
@@ -167,6 +183,11 @@ const styles = StyleSheet.create({
     },
     details: {
         marginVertical: 5,
+    },
+    detailText: {
+        fontSize: 16,
+        color: '#333',
+        marginVertical: 3,
     },
     container: {
         padding: 20,

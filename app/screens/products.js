@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -40,13 +41,16 @@ const products = () => {
         }, 1000);
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         Alert.alert("Logout", "Are you sure you want to logout?", [
             { text: "Cancel", style: "cancel" },
             {
                 text: "Logout",
                 style: "destructive",
-                onPress: () => router.replace('/'), // assuming '/' is your login or welcome screen
+                onPress: async () => {
+                    await AsyncStorage.removeItem('loggedInUser');
+                    router.replace('/'); // assuming '/' is your login or welcome screen
+                }
             }
         ]);
     };
@@ -158,61 +162,71 @@ const products = () => {
 
     if (showAddForm) {
         return (
-            <SafeAreaView style={styles.container}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Product Name"
-                    value={productName}
-                    onChangeText={setProductName}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Product Price"
-                    value={productPrice}
-                    onChangeText={setProductPrice}
-                    keyboardType="numeric"
-                />
-                <TouchableOpacity style={styles.imagePickerButton} onPress={pickImage}>
-                    <Text style={styles.imagePickerButtonText}>
-                        {productImage ? 'Change Image' : 'Pick Image'}
-                    </Text>
-                </TouchableOpacity>
-                {productImage ? (
-                    <Image source={{ uri: productImage }} style={styles.previewImage} />
-                ) : null}
-                <Button title="Add" onPress={addProduct} />
-                <Button title="Back to Products" onPress={() => setShowAddForm(false)} />
-            </SafeAreaView>
+            <ImageBackground
+                source={require('../assets/background5.jpg')} // Update the path to your image
+                style={styles.background}
+            >
+                <SafeAreaView style={styles.container}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Product Name"
+                        value={productName}
+                        onChangeText={setProductName}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Product Price"
+                        value={productPrice}
+                        onChangeText={setProductPrice}
+                        keyboardType="numeric"
+                    />
+                    <TouchableOpacity style={styles.imagePickerButton} onPress={pickImage}>
+                        <Text style={styles.imagePickerButtonText}>
+                            {productImage ? 'Change Image' : 'Pick Image'}
+                        </Text>
+                    </TouchableOpacity>
+                    {productImage ? (
+                        <Image source={{ uri: productImage }} style={styles.previewImage} />
+                    ) : null}
+                    <Button title="Add" onPress={addProduct} />
+                    <Button title="Back to Products" onPress={() => setShowAddForm(false)} />
+                </SafeAreaView>
+            </ImageBackground>
         );
     }
 
     if (showEditForm) {
         return (
-            <SafeAreaView style={styles.container}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Product Name"
-                    value={productName}
-                    onChangeText={setProductName}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Product Price"
-                    value={productPrice}
-                    onChangeText={setProductPrice}
-                    keyboardType="numeric"
-                />
-                <TouchableOpacity style={styles.imagePickerButton} onPress={pickImage}>
-                    <Text style={styles.imagePickerButtonText}>
-                        {productImage ? 'Change Image' : 'Pick Image'}
-                    </Text>
-                </TouchableOpacity>
-                {productImage ? (
-                    <Image source={{ uri: productImage }} style={styles.previewImage} />
-                ) : null}
-                <Button title="Update" onPress={updateProduct} />
-                <Button title="Back to Products" onPress={() => setShowEditForm(false)} />
-            </SafeAreaView>
+            <ImageBackground
+                source={require('../assets/background5.jpg')} // Update the path to your image
+                style={styles.background}
+            >
+                <SafeAreaView style={styles.container}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Product Name"
+                        value={productName}
+                        onChangeText={setProductName}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Product Price"
+                        value={productPrice}
+                        onChangeText={setProductPrice}
+                        keyboardType="numeric"
+                    />
+                    <TouchableOpacity style={styles.imagePickerButton} onPress={pickImage}>
+                        <Text style={styles.imagePickerButtonText}>
+                            {productImage ? 'Change Image' : 'Pick Image'}
+                        </Text>
+                    </TouchableOpacity>
+                    {productImage ? (
+                        <Image source={{ uri: productImage }} style={styles.previewImage} />
+                    ) : null}
+                    <Button title="Update" onPress={updateProduct} />
+                    <Button title="Back to Products" onPress={() => setShowEditForm(false)} />
+                </SafeAreaView>
+            </ImageBackground>
         );
     }
 
@@ -373,7 +387,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: 80,
         height: '100%',
-    }, 
+    },
     logoutButton: {
         position: 'absolute',
         bottom: 30,

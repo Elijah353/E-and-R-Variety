@@ -4,6 +4,7 @@ import * as SQLite from 'expo-sqlite';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const customers = () => {
     const [customers, setCustomers] = useState([]);
@@ -27,13 +28,16 @@ const customers = () => {
         }, 1000);
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         Alert.alert("Logout", "Are you sure you want to logout?", [
             { text: "Cancel", style: "cancel" },
             {
                 text: "Logout",
                 style: "destructive",
-                onPress: () => router.replace('/'), // assuming '/' is your login or welcome screen
+                onPress: async () => {
+                    await AsyncStorage.removeItem('loggedInUser');
+                    router.replace('/'); // assuming '/' is your login or welcome screen
+                }
             }
         ]);
     };
@@ -125,55 +129,65 @@ const customers = () => {
 
     if (showAddForm) {
         return (
-            <SafeAreaView style={styles.container}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Full Name"
-                    value={customerName}
-                    onChangeText={setCustomerName}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Username"
-                    value={username}
-                    onChangeText={setUsername}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                />
-                <Button title="Add" onPress={addCustomer} />
-                <Button title="Back to Customers" onPress={() => setShowAddForm(false)} />
-            </SafeAreaView>
+            <ImageBackground
+                source={require('../assets/background5.jpg')} // Update the path to your image
+                style={styles.background}
+            >
+                <SafeAreaView style={styles.container}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Full Name"
+                        value={customerName}
+                        onChangeText={setCustomerName}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Username"
+                        value={username}
+                        onChangeText={setUsername}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
+                    />
+                    <Button title="Add" onPress={addCustomer} />
+                    <Button title="Back to Customers" onPress={() => setShowAddForm(false)} />
+                </SafeAreaView>
+            </ImageBackground>
         );
     }
 
     if (showEditForm) {
         return (
-            <SafeAreaView style={styles.container}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Full Name"
-                    value={customerName}
-                    onChangeText={setCustomerName}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Username"
-                    value={username}
-                    onChangeText={setUsername}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                />
-                <Button title="Update" onPress={updateCustomer} />
-                <Button title="Back to Customers" onPress={() => setShowEditForm(false)} />
-            </SafeAreaView>
+            <ImageBackground
+                source={require('../assets/background5.jpg')} // Update the path to your image
+                style={styles.background}
+            >
+                <SafeAreaView style={styles.container}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Full Name"
+                        value={customerName}
+                        onChangeText={setCustomerName}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Username"
+                        value={username}
+                        onChangeText={setUsername}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
+                    />
+                    <Button title="Update" onPress={updateCustomer} />
+                    <Button title="Back to Customers" onPress={() => setShowEditForm(false)} />
+                </SafeAreaView>
+            </ImageBackground>
         );
     }
 

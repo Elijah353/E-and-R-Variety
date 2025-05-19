@@ -4,6 +4,7 @@ import * as SQLite from 'expo-sqlite';
 import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PlaceOrder = () => {
     const [customers, setCustomers] = useState([]);
@@ -13,16 +14,19 @@ const PlaceOrder = () => {
     const [totalPrice, setTotalPrice] = useState(0);
     const router = useRouter();
 
-    const handleLogout = () => {
-            Alert.alert("Logout", "Are you sure you want to logout?", [
-                { text: "Cancel", style: "cancel" },
-                {
-                    text: "Logout",
-                    style: "destructive",
-                    onPress: () => router.replace('/'), // assuming '/' is your login or welcome screen
+    const handleLogout = async () => {
+        Alert.alert("Logout", "Are you sure you want to logout?", [
+            { text: "Cancel", style: "cancel" },
+            {
+                text: "Logout",
+                style: "destructive",
+                onPress: async () => {
+                    await AsyncStorage.removeItem('loggedInUser');
+                    router.replace('/'); // assuming '/' is your login or welcome screen
                 }
-            ]);
-        };
+            }
+        ]);
+    };
 
     useEffect(() => {
         setupDatabase();
@@ -148,74 +152,74 @@ const PlaceOrder = () => {
 
     return (
         <ImageBackground
-                    source={require('../assets/background5.jpg')} // Update the path to your image
-                    style={styles.background}
+            source={require('../assets/background5.jpg')} // Update the path to your image
+            style={styles.background}
+        >
+            <SafeAreaView style={{ padding: 20 }}>
+                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Place an Order</Text>
+
+                {/* Customer Selection */}
+                <Text>Select Customer:</Text>
+                <Picker
+                    selectedValue={selectedCustomer}
+                    onValueChange={(value) => setSelectedCustomer(value)}
+                    style={{ marginVertical: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 5 }}
                 >
-        <SafeAreaView style={{ padding: 20 }}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Place an Order</Text>
+                    <Picker.Item label="Select a customer" value={null} />
+                    {customers.map((customer) => (
+                        <Picker.Item key={customer.id} label={customer.name} value={customer.id} />
+                    ))}
+                </Picker>
 
-            {/* Customer Selection */}
-            <Text>Select Customer:</Text>
-            <Picker
-                selectedValue={selectedCustomer}
-                onValueChange={(value) => setSelectedCustomer(value)}
-                style={{ marginVertical: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 5 }}
-            >
-                <Picker.Item label="Select a customer" value={null} />
-                {customers.map((customer) => (
-                    <Picker.Item key={customer.id} label={customer.name} value={customer.id} />
+                {/* Product Selection */}
+                <Text style={{ marginTop: 20 }}>Select Products:</Text>
+                <FlatList
+                    data={products}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                padding: 10,
+                                marginVertical: 5,
+                                backgroundColor: '#f5f5f5',
+                                borderRadius: 5,
+                            }}
+                            onPress={() => addProductToOrder(item)}
+                        >
+                            <Text>{item.name}</Text>
+                            <Text>${parseFloat(item.price).toFixed(2)}</Text>
+                        </TouchableOpacity>
+                    )}
+                />
+
+                {/* Order Summary */}
+                <Text style={{ marginTop: 20, fontWeight: 'bold' }}>Order Summary:</Text>
+                {selectedProducts.map((product, index) => (
+                    <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 5 }}>
+                        <Text>{product.name} x{product.quantity}</Text>
+                        <TouchableOpacity onPress={() => removeProductFromOrder(product.id)}>
+                            <Text style={{ color: 'red' }}>Remove</Text>
+                        </TouchableOpacity>
+                    </View>
                 ))}
-            </Picker>
+                <Text style={{ marginTop: 10, fontWeight: 'bold' }}>Total: ${totalPrice.toFixed(2)}</Text>
 
-            {/* Product Selection */}
-            <Text style={{ marginTop: 20 }}>Select Products:</Text>
-            <FlatList
-                data={products}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            padding: 10,
-                            marginVertical: 5,
-                            backgroundColor: '#f5f5f5',
-                            borderRadius: 5,
-                        }}
-                        onPress={() => addProductToOrder(item)}
-                    >
-                        <Text>{item.name}</Text>
-                        <Text>${parseFloat(item.price).toFixed(2)}</Text>
-                    </TouchableOpacity>
-                )}
-            />
-
-            {/* Order Summary */}
-            <Text style={{ marginTop: 20, fontWeight: 'bold' }}>Order Summary:</Text>
-            {selectedProducts.map((product, index) => (
-                <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 5 }}>
-                    <Text>{product.name} x{product.quantity}</Text>
-                    <TouchableOpacity onPress={() => removeProductFromOrder(product.id)}>
-                        <Text style={{ color: 'red' }}>Remove</Text>
-                    </TouchableOpacity>
+                {/* Save and Cancel Buttons */}
+                <View style={{ marginTop: 20 }}>
+                    <Button title="Save Order" onPress={saveOrder} />
+                    <Button title="Cancel" color="red" onPress={() => { setSelectedCustomer(null); setSelectedProducts([]); setTotalPrice(0); }} />
                 </View>
-            ))}
-            <Text style={{ marginTop: 10, fontWeight: 'bold' }}>Total: ${totalPrice.toFixed(2)}</Text>
 
-            {/* Save and Cancel Buttons */}
-            <View style={{ marginTop: 20 }}>
-                <Button title="Save Order" onPress={saveOrder} />
-                <Button title="Cancel" color="red" onPress={() => { setSelectedCustomer(null); setSelectedProducts([]); setTotalPrice(0); }} />
-            </View>
-            
-        </SafeAreaView>
-        {/* Logout button fixed at bottom left */}
-                            <TouchableOpacity
-                                style={styles.logoutButton}
-                                onPress={handleLogout}
-                            >
-                                <MaterialIcons name="logout" size={28} color="#007AFF" />
-                            </TouchableOpacity>
+            </SafeAreaView>
+            {/* Logout button fixed at bottom left */}
+            <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={handleLogout}
+            >
+                <MaterialIcons name="logout" size={28} color="#007AFF" />
+            </TouchableOpacity>
         </ImageBackground>
     );
 };
