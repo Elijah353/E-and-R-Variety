@@ -53,7 +53,7 @@ const PlaceOrder = () => {
             email TEXT NOT NULL
         )
     `);
-    
+
         // await db.runAsync(
         //     `DROP TABLE IF EXISTS orders`
         // )
@@ -245,8 +245,9 @@ const styles = StyleSheet.create({
     customerPicker: {
         marginVertical: 10,
         borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
+        borderColor: '#007AFF', // darker border for visibility
+        borderRadius: 16,
+        backgroundColor: '#f5f5f5', // light gray, or use '#fff' for white
     },
     productTitle: {
         marginTop: 20,
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
         padding: 10,
         marginVertical: 5,
         backgroundColor: '#f5f5f5',
-        borderRadius: 5,
+        borderRadius: 16,
     },
     orderSummaryTitle: {
         marginTop: 20,

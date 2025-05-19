@@ -96,7 +96,7 @@ const products = () => {
                 Alert.alert("Product added!");
             } catch (e) {
                 console.log('DB error:', e);
-                Alert.alert("Error adding product", e.message);
+                Alert.alert("Error adding product");
             }
         } else {
             Alert.alert("Please enter a product name and price."); // Updated message
@@ -115,7 +115,7 @@ const products = () => {
                 fetchProducts();
                 Alert.alert("Product updated!");
             } catch (e) {
-                Alert.alert("Error updating product", e.message);
+                Alert.alert("Error updating product");
             }
         }
     };
@@ -127,7 +127,7 @@ const products = () => {
             fetchProducts();
             Alert.alert("Product deleted!");
         } catch (e) {
-            Alert.alert("Error deleting product", e.message);
+            Alert.alert("Error deleting product");
         }
     };
 
@@ -172,6 +172,7 @@ const products = () => {
                         placeholder="Product Name"
                         value={productName}
                         onChangeText={setProductName}
+                        placeholderTextColor="#333"
                     />
                     <TextInput
                         style={styles.input}
@@ -179,6 +180,7 @@ const products = () => {
                         value={productPrice}
                         onChangeText={setProductPrice}
                         keyboardType="numeric"
+                        placeholderTextColor="#333"
                     />
                     <TouchableOpacity style={styles.imagePickerButton} onPress={pickImage}>
                         <Text style={styles.imagePickerButtonText}>
@@ -207,6 +209,7 @@ const products = () => {
                         placeholder="Product Name"
                         value={productName}
                         onChangeText={setProductName}
+                        placeholderTextColor="#333"
                     />
                     <TextInput
                         style={styles.input}
@@ -214,6 +217,7 @@ const products = () => {
                         value={productPrice}
                         onChangeText={setProductPrice}
                         keyboardType="numeric"
+                        placeholderTextColor="#333"
                     />
                     <TouchableOpacity style={styles.imagePickerButton} onPress={pickImage}>
                         <Text style={styles.imagePickerButtonText}>
@@ -319,7 +323,7 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: '#007AFF',
         borderRadius: 5,
         padding: 10,
         marginBottom: 10,
@@ -328,7 +332,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: 'white',
         padding: 10,
-        borderRadius: 5,
+        borderRadius: 16,
         marginBottom: 10,
     },
     productImage: {

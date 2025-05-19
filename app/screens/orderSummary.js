@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
         padding: 15,
         marginVertical: 5,
         backgroundColor: '#f5f5f5',
-        borderRadius: 5,
+        borderRadius: 16,
     },
     customerName: {
         fontSize: 16,

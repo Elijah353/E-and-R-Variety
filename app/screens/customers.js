@@ -83,7 +83,7 @@ const customers = () => {
                 Alert.alert("Customer added!");
             } catch (e) {
                 console.log('DB error:', e);
-                Alert.alert("Error adding customer", e.message);
+                Alert.alert("Error adding customer");
             }
         } else {
             Alert.alert("Please enter a customer name, username, and email.");
@@ -102,7 +102,7 @@ const customers = () => {
                 fetchCustomers();
                 Alert.alert("Customer updated!");
             } catch (e) {
-                Alert.alert("Error updating customer", e.message);
+                Alert.alert("Error updating customer");
             }
         }
     };
@@ -114,7 +114,7 @@ const customers = () => {
             fetchCustomers();
             Alert.alert("Customer deleted!");
         } catch (e) {
-            Alert.alert("Error deleting Customer", e.message);
+            Alert.alert("Error deleting Customer");
         }
     };
 
@@ -139,18 +139,21 @@ const customers = () => {
                         placeholder="Full Name"
                         value={customerName}
                         onChangeText={setCustomerName}
+                        placeholderTextColor="#333"
                     />
                     <TextInput
                         style={styles.input}
                         placeholder="Username"
                         value={username}
                         onChangeText={setUsername}
+                        placeholderTextColor="#333"
                     />
                     <TextInput
                         style={styles.input}
                         placeholder="Email"
                         value={email}
                         onChangeText={setEmail}
+                        placeholderTextColor="#333"
                     />
                     <Button title="Add" onPress={addCustomer} />
                     <Button title="Back to Customers" onPress={() => setShowAddForm(false)} />
@@ -171,18 +174,21 @@ const customers = () => {
                         placeholder="Full Name"
                         value={customerName}
                         onChangeText={setCustomerName}
+                        placeholderTextColor="#333"
                     />
                     <TextInput
                         style={styles.input}
                         placeholder="Username"
                         value={username}
                         onChangeText={setUsername}
+                        placeholderTextColor="#333"
                     />
                     <TextInput
                         style={styles.input}
                         placeholder="Email"
                         value={email}
                         onChangeText={setEmail}
+                        placeholderTextColor="#333"
                     />
                     <Button title="Update" onPress={updateCustomer} />
                     <Button title="Back to Customers" onPress={() => setShowEditForm(false)} />
@@ -267,7 +273,7 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: '#007AFF',
         borderRadius: 5,
         padding: 10,
         marginBottom: 10,
@@ -276,7 +282,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: 'white',
         padding: 10,
-        borderRadius: 5,
+        borderRadius: 16,
         marginBottom: 10,
     },
     customerDetails: {

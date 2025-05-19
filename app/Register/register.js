@@ -41,6 +41,8 @@ const Users = () => {
     // Login form state
     const [loginUsername, setLoginUsername] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
+    const [dbReady, setDbReady] = useState(false);
+
 
     useEffect(() => {
         const checkLogin = async () => {
@@ -66,6 +68,7 @@ const Users = () => {
                 password TEXT NOT NULL
             )`
         );
+        setDbReady(true);
     };
 
     const resetRegisterForm = () => {
@@ -87,6 +90,10 @@ const Users = () => {
     };
 
     const addUser = async () => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         if (!name || !username || !email || !password || !confirmPassword) {
             Alert.alert('Please fill all registration fields.');
             return;
@@ -140,11 +147,15 @@ const Users = () => {
             setActiveTab('login');
         } catch (e) {
             console.log('DB error:', e);
-            Alert.alert('Error adding user', e.message);
+            Alert.alert('Error adding user');
         }
     };
 
     const loginUser = async () => {
+        if (!dbReady) {
+            Alert.alert('Please try again in a moment or restart the application.');
+            return;
+        }
         if (!loginUsername || !loginPassword) {
             Alert.alert('Please enter username and password.');
             return;
@@ -175,7 +186,7 @@ const Users = () => {
             }
         } catch (e) {
             console.log('DB error:', e);
-            Alert.alert('Error logging in', e.message);
+            Alert.alert('Error logging in');
         }
     };
 
@@ -242,9 +253,17 @@ const Users = () => {
                             placeholderTextColor="#999"
                         />
 
-                        <TouchableOpacity style={styles.registerButton} onPress={addUser}>
+                        <TouchableOpacity
+                            style={[
+                                styles.registerButton,
+                                !dbReady && { backgroundColor: '#aaa' } // visually indicate disabled
+                            ]}
+                            onPress={addUser}
+                            disabled={!dbReady} // <-- disable if db not ready
+                        >
                             <Text style={styles.registerButtonText}>Register</Text>
                         </TouchableOpacity>
+
                     </View>
                 ) : (
                     <View style={styles.formContainer}>
@@ -270,9 +289,17 @@ const Users = () => {
                             />
                             <Text style={{ marginLeft: 8 }}>Remember Me</Text>
                         </View>
-                        <TouchableOpacity style={styles.registerButton} onPress={loginUser}>
+                        <TouchableOpacity
+                            style={[
+                                styles.registerButton,
+                                !dbReady && { backgroundColor: '#aaa' }
+                            ]}
+                            onPress={loginUser}
+                            disabled={!dbReady}
+                        >
                             <Text style={styles.registerButtonText}>Login</Text>
                         </TouchableOpacity>
+
                     </View>
                 )}
             </SafeAreaView>
