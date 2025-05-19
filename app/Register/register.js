@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Text, StyleSheet, View, SafeAreaView, TextInput, Alert, TouchableOpacity } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -28,6 +28,8 @@ const CustomCheckBox = ({ value, onValueChange }) => (
 
 const Users = () => {
     const router = useRouter();
+    const dbRef = useRef(null);
+    const [dbReady, setDbReady] = useState(false);
 
     const [activeTab, setActiveTab] = useState('register'); // 'register' or 'login'
 
@@ -41,17 +43,16 @@ const Users = () => {
     // Login form state
     const [loginUsername, setLoginUsername] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
-    const [dbReady, setDbReady] = useState(false);
 
     useEffect(() => {
-        initialize();
-    }, []);
-
-    const initialize = async () => {
+        const initialize = async () => {
+            dbRef.current = await SQLite.openDatabaseAsync("mobileApps.db");
             await setupDatabase();
             setDbReady(true);
             checkLogin();
         };
+        initialize();
+    }, []);
 
     const checkLogin = async () => {
         const user = await AsyncStorage.getItem('loggedInUser');
@@ -62,8 +63,7 @@ const Users = () => {
     };
 
     const setupDatabase = async () => {
-        const db = await SQLite.openDatabaseAsync("mobileApps.db");
-        // await db.runAsync(`DROP TABLE IF EXISTS users`);  // remove for production
+        const db = dbRef.current;
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -159,7 +159,7 @@ const Users = () => {
         }
 
         try {
-            const db = await SQLite.openDatabaseAsync('mobileApps.db');
+            const db = dbRef.current;
 
             const existingUsers = await db.getAllAsync(
                 'SELECT * FROM users WHERE email = ? OR username = ?',
@@ -206,7 +206,7 @@ const Users = () => {
         }
 
         try {
-            const db = await SQLite.openDatabaseAsync('mobileApps.db');
+            const db = dbRef.current;
 
             const result = await db.getAllAsync(
                 'SELECT * FROM users WHERE username = ? AND password = ?',

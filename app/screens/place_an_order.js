@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, Button, ScrollView, TouchableOpacity, Alert, SafeAreaView, StyleSheet, ImageBackground, RefreshControl } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { Picker } from '@react-native-picker/picker';
@@ -7,6 +7,8 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PlaceOrder = () => {
+    const dbRef = useRef(null);
+    const [dbReady, setDbReady] = useState(false);
     const [customers, setCustomers] = useState([]);
     const [products, setProducts] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -14,6 +16,17 @@ const PlaceOrder = () => {
     const [totalPrice, setTotalPrice] = useState(0);
     const [refreshing, setRefreshing] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        const init = async () => {
+            dbRef.current = await SQLite.openDatabaseAsync("mobileApps.db");
+            await setupDatabase();
+            setDbReady(true);
+            fetchCustomers();
+            fetchProducts();
+        };
+        init();
+    }, []);
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -37,69 +50,63 @@ const PlaceOrder = () => {
         ]);
     };
 
-    useEffect(() => {
-        setupDatabase();
-        fetchCustomers();
-        fetchProducts();
-    }, []);
-
     const setupDatabase = async () => {
-        const db = await SQLite.openDatabaseAsync("mobileApps.db");
-        // await db.runAsync(`DROP TABLE IF EXISTS users`);  // remove for production
+        const db = dbRef.current;
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS users (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        name TEXT NOT NULL,
-                        username TEXT NOT NULL,
-                        email TEXT NOT NULL,
-                        password TEXT NOT NULL
-                    )`
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                username TEXT NOT NULL,
+                email TEXT NOT NULL,
+                password TEXT NOT NULL
+            )`
         );
 
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS products (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    price REAL NOT NULL,
-                    image TEXT
-                )`
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            price REAL NOT NULL,
+            image TEXT
+        )`
         );
 
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS customers (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    username TEXT NOT NULL,
-                    email TEXT NOT NULL
-                )`
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            username TEXT NOT NULL,
+            email TEXT NOT NULL
+        )`
         );
 
         await db.runAsync(`
-                    CREATE TABLE IF NOT EXISTS orders (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        customer_id INTEGER NOT NULL,
-                        total_price REAL NOT NULL,
-                        order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (customer_id) REFERENCES customers(id)
-                    )
-                `);
+            CREATE TABLE IF NOT EXISTS orders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_id INTEGER NOT NULL,
+                total_price REAL NOT NULL,
+                order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (customer_id) REFERENCES customers(id)
+            )
+        `);
 
         await db.runAsync(`
-                    CREATE TABLE IF NOT EXISTS order_items (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        order_id INTEGER NOT NULL,
-                        product_id INTEGER NOT NULL,
-                        quantity INTEGER DEFAULT 1,
-                        FOREIGN KEY (order_id) REFERENCES orders(id),
-                        FOREIGN KEY (product_id) REFERENCES products(id)
-                    )
-                `);
+            CREATE TABLE IF NOT EXISTS order_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                order_id INTEGER NOT NULL,
+                product_id INTEGER NOT NULL,
+                quantity INTEGER DEFAULT 1,
+                FOREIGN KEY (order_id) REFERENCES orders(id),
+                FOREIGN KEY (product_id) REFERENCES products(id)
+            )
+        `);
+        setDbReady(true);
     };
 
     // Fetch customers from the database
     const fetchCustomers = async () => {
         try {
-            const db = await SQLite.openDatabaseAsync("mobileApps.db");
+            const db = dbRef.current;
             const allRows = await db.getAllAsync("SELECT * FROM customers");
             setCustomers(allRows);
         } catch (e) {
@@ -110,7 +117,7 @@ const PlaceOrder = () => {
     // Fetch products from the database
     const fetchProducts = async () => {
         try {
-            const db = await SQLite.openDatabaseAsync("mobileApps.db");
+            const db = dbRef.current;
             const allRows = await db.getAllAsync("SELECT * FROM products");
             setProducts(allRows);
         } catch (e) {
@@ -158,7 +165,7 @@ const PlaceOrder = () => {
         }
 
         try {
-            const db = await SQLite.openDatabaseAsync("mobileApps.db");
+            const db = dbRef.current;
             await db.runAsync(
                 "INSERT INTO orders (customer_id, total_price) VALUES (?, ?)",
                 [selectedCustomer, totalPrice],

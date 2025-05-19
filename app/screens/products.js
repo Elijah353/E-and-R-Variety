@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Text, StyleSheet, FlatList, View, Image, SafeAreaView, Button, TextInput, Alert, TouchableOpacity, RefreshControl, ImageBackground } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import * as ImagePicker from 'expo-image-picker';
@@ -10,6 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const products = () => {
+    const dbRef = useRef(null);
+    const [dbReady, setDbReady] = useState(false);
     const [products, setProducts] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
@@ -20,15 +22,15 @@ const products = () => {
     const [refreshing, setRefreshing] = useState(false);
     const router = useRouter();
 
-    // useEffect(() => {
-    //     const logoutTimer = setTimeout(() => {
-    //         alert("You have been logged out due to inactivity.");
-    //         router.replace('/register/register'); // change this to your actual login screen path
-    //     }, 10000); // 10 seconds = 10000 ms
-
-    //     return () => clearTimeout(logoutTimer); // clean up
-    // }, []);
-
+    useEffect(() => {
+        const init = async () => {
+            dbRef.current = await SQLite.openDatabaseAsync("mobileApps.db");
+            await setupDatabase();
+            setDbReady(true);
+            fetchProducts();
+        };
+        init();
+    }, []);
 
     // Refresh handler
     const onRefresh = () => {
@@ -54,65 +56,61 @@ const products = () => {
         ]);
     };
 
-    useEffect(() => {
-        setupDatabase().then(fetchProducts);
-    }, []);
-
     const setupDatabase = async () => {
-        const db = await SQLite.openDatabaseAsync("mobileApps.db");
-        // await db.runAsync(`DROP TABLE IF EXISTS users`);  // remove for production
+        const db = dbRef.current;
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS users (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        name TEXT NOT NULL,
-                        username TEXT NOT NULL,
-                        email TEXT NOT NULL,
-                        password TEXT NOT NULL
-                    )`
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                username TEXT NOT NULL,
+                email TEXT NOT NULL,
+                password TEXT NOT NULL
+            )`
         );
 
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS products (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    price REAL NOT NULL,
-                    image TEXT
-                )`
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            price REAL NOT NULL,
+            image TEXT
+        )`
         );
 
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS customers (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    username TEXT NOT NULL,
-                    email TEXT NOT NULL
-                )`
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            username TEXT NOT NULL,
+            email TEXT NOT NULL
+        )`
         );
 
         await db.runAsync(`
-                    CREATE TABLE IF NOT EXISTS orders (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        customer_id INTEGER NOT NULL,
-                        total_price REAL NOT NULL,
-                        order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        FOREIGN KEY (customer_id) REFERENCES customers(id)
-                    )
-                `);
+            CREATE TABLE IF NOT EXISTS orders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_id INTEGER NOT NULL,
+                total_price REAL NOT NULL,
+                order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (customer_id) REFERENCES customers(id)
+            )
+        `);
 
         await db.runAsync(`
-                    CREATE TABLE IF NOT EXISTS order_items (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        order_id INTEGER NOT NULL,
-                        product_id INTEGER NOT NULL,
-                        quantity INTEGER DEFAULT 1,
-                        FOREIGN KEY (order_id) REFERENCES orders(id),
-                        FOREIGN KEY (product_id) REFERENCES products(id)
-                    )
-                `);
+            CREATE TABLE IF NOT EXISTS order_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                order_id INTEGER NOT NULL,
+                product_id INTEGER NOT NULL,
+                quantity INTEGER DEFAULT 1,
+                FOREIGN KEY (order_id) REFERENCES orders(id),
+                FOREIGN KEY (product_id) REFERENCES products(id)
+            )
+        `);
+        setDbReady(true);
     };
 
     const fetchProducts = async () => {
-        const db = await SQLite.openDatabaseAsync("mobileApps.db");
+        const db = dbRef.current;
         const allRows = await db.getAllAsync("SELECT * FROM products");
         setProducts(allRows);
     };
@@ -120,7 +118,7 @@ const products = () => {
     const addProduct = async () => {
         if (productName && productPrice) { // Removed productImage check
             try {
-                const db = await SQLite.openDatabaseAsync("mobileApps.db");
+                const db = dbRef.current;
                 await db.runAsync(
                     "INSERT INTO products (name, price, image) VALUES (?, ?, ?)",
                     [productName, parseFloat(productPrice), productImage || null] // Allow null image
@@ -143,7 +141,7 @@ const products = () => {
     const updateProduct = async () => {
         if (selectedProduct) {
             try {
-                const db = await SQLite.openDatabaseAsync("mobileApps.db");
+                const db = dbRef.current;
                 await db.runAsync(
                     "UPDATE products SET name = ?, price = ?, image = ? WHERE id = ?",
                     [productName, parseFloat(productPrice), productImage, selectedProduct.id]
@@ -159,7 +157,7 @@ const products = () => {
 
     const deleteProduct = async (id) => {
         try {
-            const db = await SQLite.openDatabaseAsync("mobileApps.db");
+            const db = dbRef.current;
             await db.runAsync("DELETE FROM products WHERE id = ?", [id]);
             fetchProducts();
             Alert.alert("Product deleted!");
