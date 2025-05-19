@@ -75,6 +75,12 @@ const OrderSummary = () => {
         fetchOrderDetails(order.id);
     };
 
+    function parseSQLiteDateToLocal(dateString) {
+        if (!dateString) return '';
+        const isoString = dateString.replace(' ', 'T') + 'Z';
+        return new Date(isoString).toLocaleString();
+    }
+
     // Render each order in the list
     const renderOrder = ({ item }) => (
         <TouchableOpacity
@@ -83,7 +89,7 @@ const OrderSummary = () => {
         >
             <Text style={styles.customerName}>{item.customer_name}</Text>
             <Text>Total: ${item.total_price.toFixed(2)}</Text>
-            <Text>Date: {new Date(item.order_date).toLocaleString()}</Text>
+            <Text>Date: {parseSQLiteDateToLocal(item.order_date)}</Text>
         </TouchableOpacity>
     );
 

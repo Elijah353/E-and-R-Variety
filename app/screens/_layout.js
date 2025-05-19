@@ -14,6 +14,7 @@ export default () => {
             backgroundColor: '#007AFF',
         },
         tabBarActiveTintColor: 'white',
+        tabBarInactiveTintColor: 'lighblue',
     }}>
         <Tabs.Screen name="products" options={{
             tabBarIcon: ({ color }) =>
