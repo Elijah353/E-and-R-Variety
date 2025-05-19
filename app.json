@@ -5,6 +5,13 @@
       "expo-router"
     ],
     "name": "Mobile-Apps",
-    "slug": "Mobile-Apps"
+    "slug": "eandr-variety",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "010f253a-d850-434d-9432-30a135fec2d5"
+      }
+    },
+    "owner": "elijah1_234"
   }
 }
