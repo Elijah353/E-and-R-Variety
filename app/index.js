@@ -13,7 +13,7 @@ const Welcome = () => {
       <View style={styles.overlay} />
 
       <View style={styles.container}>
-        <Text style={styles.title}>Welcome to E & R Varity</Text>
+        <Text style={styles.title}>Welcome to E & R Variety</Text>
 
         <TouchableOpacity 
           style={styles.button} 

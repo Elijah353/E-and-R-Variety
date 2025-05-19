@@ -239,9 +239,13 @@ const customers = () => {
                                 refreshing={refreshing}
                                 onRefresh={onRefresh}
                             />
-                        } />
-                    {/* Logout button fixed at bottom left */}
-                    <TouchableOpacity
+                        } 
+                        contentContainerStyle={{ paddingBottom: 100 }} 
+                    />
+            
+                </SafeAreaView>
+                {/* Logout button fixed at bottom left */}
+                <TouchableOpacity
                         style={styles.logoutButton}
                         onPress={handleLogout}
                     >
@@ -250,7 +254,6 @@ const customers = () => {
                     <TouchableOpacity style={styles.squareButton} onPress={() => { resetForm(); setShowAddForm(true); }}>
                         <Text style={styles.squareButtonText}>+</Text>
                     </TouchableOpacity>
-                </SafeAreaView>
             </ImageBackground>
         </GestureHandlerRootView>
     );

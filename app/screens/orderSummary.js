@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, SafeAreaView, Alert, RefreshControl, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, SafeAreaView, Alert, RefreshControl, StyleSheet, ImageBackground, ScrollView } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -111,14 +111,16 @@ const OrderSummary = () => {
                 Order Date: {parseSQLiteDateToLocal(selectedOrder.order_date)}
             </Text>
 
-            {orderDetails.map((item, index) => (
-                <View key={index} style={styles.productRow}>
-                    <Text style={styles.productName}>{item.product_name}</Text>
-                    <View style={styles.quantityBadge}>
-                        <Text style={styles.quantityText}>x{item.quantity}</Text>
+            <ScrollView style={{ maxHeight: 250, marginVertical: 10 }}>
+                {orderDetails.map((item, index) => (
+                    <View key={index} style={styles.productRow}>
+                        <Text style={styles.productName}>{item.product_name}</Text>
+                        <View style={styles.quantityBadge}>
+                            <Text style={styles.quantityText}>x{item.quantity}</Text>
+                        </View>
                     </View>
-                </View>
-            ))}
+                ))}
+            </ScrollView>
 
             <TouchableOpacity onPress={() => setSelectedOrder(null)}>
                 <Text style={{ color: 'blue', marginTop: 10 }}>Back to Orders</Text>
@@ -147,6 +149,7 @@ const OrderSummary = () => {
                             />
                         }
                         ListEmptyComponent={<Text>No orders found.</Text>}
+                        contentContainerStyle={{ paddingBottom: 100 }}
                     />
                 )}
             </SafeAreaView>
@@ -199,7 +202,7 @@ const styles = StyleSheet.create({
         marginVertical: 8,
         paddingVertical: 6,
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        borderBottomColor: '#000',
     },
     productName: {
         fontSize: 16,

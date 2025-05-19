@@ -281,23 +281,22 @@ const products = () => {
                                 onRefresh={onRefresh}
                             />
                         }
+                         contentContainerStyle={{ paddingBottom: 100 }}
                     />
-
-                    <TouchableOpacity
+                </SafeAreaView>
+                <TouchableOpacity
                         style={styles.squareButton}
                         onPress={() => { resetForm(); setShowAddForm(true); }}
                     >
                         <Text style={styles.squareButtonText}>+</Text>
                     </TouchableOpacity>
-
-                    {/* Logout button fixed at bottom left */}
+                {/* Logout button fixed at bottom left */}
                     <TouchableOpacity
                         style={styles.logoutButton}
                         onPress={handleLogout}
                     >
                         <MaterialIcons name="logout" size={28} color="#007AFF" />
                     </TouchableOpacity>
-                </SafeAreaView>
             </ImageBackground>
         </GestureHandlerRootView>
     );

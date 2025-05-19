@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Button, TextInput, TouchableOpacity, Alert, SafeAreaView, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, FlatList, Button, ScrollView, TouchableOpacity, Alert, SafeAreaView, StyleSheet, ImageBackground, RefreshControl } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -12,7 +12,15 @@ const PlaceOrder = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [refreshing, setRefreshing] = useState(false);
     const router = useRouter();
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await fetchCustomers();
+        await fetchProducts();
+        setRefreshing(false);
+    };
 
     const handleLogout = async () => {
         Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -155,15 +163,14 @@ const PlaceOrder = () => {
             source={require('../assets/background5.jpg')} // Update the path to your image
             style={styles.background}
         >
-            <SafeAreaView style={{ padding: 20 }}>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Place an Order</Text>
+            <SafeAreaView style={{ flex: 1, padding: 20 }}>
 
                 {/* Customer Selection */}
                 <Text>Select Customer:</Text>
                 <Picker
                     selectedValue={selectedCustomer}
                     onValueChange={(value) => setSelectedCustomer(value)}
-                    style={{ marginVertical: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 5 }}
+                    style={styles.customerPicker}
                 >
                     <Picker.Item label="Select a customer" value={null} />
                     {customers.map((customer) => (
@@ -172,38 +179,36 @@ const PlaceOrder = () => {
                 </Picker>
 
                 {/* Product Selection */}
-                <Text style={{ marginTop: 20 }}>Select Products:</Text>
+                <Text style={styles.productTitle}>Select Products:</Text>
                 <FlatList
                     data={products}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
                         <TouchableOpacity
-                            style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                padding: 10,
-                                marginVertical: 5,
-                                backgroundColor: '#f5f5f5',
-                                borderRadius: 5,
-                            }}
+                            style={styles.productItem}
                             onPress={() => addProductToOrder(item)}
                         >
                             <Text>{item.name}</Text>
                             <Text>${parseFloat(item.price).toFixed(2)}</Text>
                         </TouchableOpacity>
                     )}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    }
                 />
 
                 {/* Order Summary */}
-                <Text style={{ marginTop: 20, fontWeight: 'bold' }}>Order Summary:</Text>
-                {selectedProducts.map((product, index) => (
-                    <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 5 }}>
-                        <Text>{product.name} x{product.quantity}</Text>
-                        <TouchableOpacity onPress={() => removeProductFromOrder(product.id)}>
-                            <Text style={{ color: 'red' }}>Remove</Text>
-                        </TouchableOpacity>
-                    </View>
-                ))}
+                <Text style={styles.orderSummaryTitle}>Order Summary:</Text>
+                <ScrollView style={{ maxHeight: 200, marginBottom: 10 }}>
+                    {selectedProducts.map((product, index) => (
+                        <View key={index} style={styles.orderItem}>
+                            <Text>{product.name} x{product.quantity}</Text>
+                            <TouchableOpacity onPress={() => removeProductFromOrder(product.id)}>
+                                <Text style={{ color: 'red' }}>Remove</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+                </ScrollView>
                 <Text style={{ marginTop: 10, fontWeight: 'bold' }}>Total: ${totalPrice.toFixed(2)}</Text>
 
                 {/* Save and Cancel Buttons */}
@@ -227,6 +232,32 @@ const PlaceOrder = () => {
 export default PlaceOrder;
 
 const styles = StyleSheet.create({
+    customerPicker: {
+        marginVertical: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+    },
+    productTitle: {
+        marginTop: 20,
+    },
+    productItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 10,
+        marginVertical: 5,
+        backgroundColor: '#f5f5f5',
+        borderRadius: 5,
+    },
+    orderSummaryTitle: {
+        marginTop: 20,
+        fontWeight: 'bold',
+    },
+    orderItem: {
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        marginVertical: 5,
+    },
     logoutButton: {
         position: 'absolute',
         bottom: 30,
