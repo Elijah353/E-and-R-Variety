@@ -17,6 +17,7 @@ const PlaceOrder = () => {
     const [refreshing, setRefreshing] = useState(false);
     const router = useRouter();
 
+    // Initialize database and fetch customers/products
     useEffect(() => {
         const init = async () => {
             dbRef.current = await SQLite.openDatabaseAsync("mobileApps.db");
@@ -28,6 +29,7 @@ const PlaceOrder = () => {
         init();
     }, []);
 
+    // Refresh handler for customers and products
     const onRefresh = async () => {
         setRefreshing(true);
         setupDatabase();
@@ -36,6 +38,7 @@ const PlaceOrder = () => {
         setRefreshing(false);
     };
 
+    // Handle user logout
     const handleLogout = async () => {
         Alert.alert("Logout", "Are you sure you want to logout?", [
             { text: "Cancel", style: "cancel" },
@@ -50,6 +53,7 @@ const PlaceOrder = () => {
         ]);
     };
 
+    // Create all necessary tables if they do not exist
     const setupDatabase = async () => {
         const db = dbRef.current;
         await db.runAsync(
@@ -201,9 +205,10 @@ const PlaceOrder = () => {
         }
     };
 
+    // Main UI rendering
     return (
         <ImageBackground
-            source={require('../assets/background5.jpg')} // Update the path to your image
+            source={require('../assets/background5.jpg')}
             style={styles.background}
         >
             <SafeAreaView style={{ flex: 1, padding: 20 }}>
@@ -278,9 +283,9 @@ const styles = StyleSheet.create({
     customerPicker: {
         marginVertical: 10,
         borderWidth: 1,
-        borderColor: '#007AFF', // darker border for visibility
+        borderColor: '#007AFF',
         borderRadius: 16,
-        backgroundColor: '#f5f5f5', // light gray, or use '#fff' for white
+        backgroundColor: '#f5f5f5',
     },
     productTitle: {
         marginTop: 20,
@@ -306,14 +311,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 30,
         left: 30,
-        width: 60,            // same as squareButton
-        height: 60,           // same as squareButton
+        width: 60,
+        height: 60,
         backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 12,     // same as squareButton
-        elevation: 4,         // shadow Android
-        shadowColor: '#000',  // shadow iOS
+        borderRadius: 12,
+        elevation: 4,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,

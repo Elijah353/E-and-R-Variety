@@ -19,6 +19,7 @@ const customers = () => {
     const [refreshing, setRefreshing] = useState(false);
     const router = useRouter();
 
+    // Initialize database and fetch customers
     useEffect(() => {
         const init = async () => {
             dbRef.current = await SQLite.openDatabaseAsync("mobileApps.db");
@@ -29,16 +30,16 @@ const customers = () => {
         init();
     }, []);
 
-    // Refresh handler
+    // Refresh customer list and ensure tables exist
     const onRefresh = () => {
         setRefreshing(true);
-        // Simulate a network request
         setTimeout(() => {
             setupDatabase().then(fetchCustomers);
             setRefreshing(false);
         }, 1000);
     };
 
+    // Handle user logout
     const handleLogout = async () => {
         Alert.alert("Logout", "Are you sure you want to logout?", [
             { text: "Cancel", style: "cancel" },
@@ -53,6 +54,7 @@ const customers = () => {
         ]);
     };
 
+    // Create all necessary tables if they do not exist
     const setupDatabase = async () => {
         const db = dbRef.current;
         await db.runAsync(
@@ -106,6 +108,7 @@ const customers = () => {
         setDbReady(true);
     };
 
+    // Fetch all customers from the database
     const fetchCustomers = async () => {
         if (!dbReady) {
             Alert.alert('Please try again in a moment or restart the application.');
@@ -116,6 +119,7 @@ const customers = () => {
         setCustomers(allRows);
     };
 
+    // Add a new customer to the database
     const addCustomer = async () => {
         if (!dbReady) {
             Alert.alert('Please try again in a moment or restart the application.');
@@ -143,6 +147,7 @@ const customers = () => {
         }
     };
 
+    // Update an existing customer in the database
     const updateCustomer = async () => {
         if (!dbReady) {
             Alert.alert('Please try again in a moment or restart the application.');
@@ -164,6 +169,7 @@ const customers = () => {
         }
     };
 
+    // Delete a customer from the database
     const deleteCustomer = async (id) => {
         if (!dbReady) {
             Alert.alert('Please try again in a moment or restart the application.');
@@ -179,6 +185,7 @@ const customers = () => {
         }
     };
 
+    // Reset form fields and state
     const resetForm = () => {
         setCustomerName('');
         setUsername('');
@@ -191,7 +198,7 @@ const customers = () => {
     if (showAddForm) {
         return (
             <ImageBackground
-                source={require('../assets/background5.jpg')} // Update the path to your image
+                source={require('../assets/background5.jpg')}
                 style={styles.background}
             >
                 <SafeAreaView style={styles.container}>
@@ -226,7 +233,7 @@ const customers = () => {
     if (showEditForm) {
         return (
             <ImageBackground
-                source={require('../assets/background5.jpg')} // Update the path to your image
+                source={require('../assets/background5.jpg')}
                 style={styles.background}
             >
                 <SafeAreaView style={styles.container}>
@@ -258,6 +265,7 @@ const customers = () => {
         );
     }
 
+    // Render swipeable delete action for each customer
     const renderRightActions = (item) => (
         <TouchableOpacity
             style={styles.deleteIconContainer}
@@ -271,6 +279,7 @@ const customers = () => {
         </TouchableOpacity>
     );
 
+    // Render each customer item
     const renderItem = ({ item }) => (
         <Swipeable renderRightActions={() => renderRightActions(item)}>
             <TouchableOpacity onPress={() => {
@@ -291,10 +300,11 @@ const customers = () => {
         </Swipeable>
     );
 
+    // Main UI rendering
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <ImageBackground
-                source={require('../assets/background5.jpg')} // Update the path to your image
+                source={require('../assets/background5.jpg')}
                 style={styles.background}
             >
                 <SafeAreaView style={styles.container}>
@@ -369,15 +379,15 @@ const styles = StyleSheet.create({
     squareButton: {
         position: 'absolute',
         bottom: 30,
-        right: 30, // <-- Move button to the right
+        right: 30,
         width: 60,
         height: 60,
         backgroundColor: '#007AFF',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 12,
-        elevation: 4, // for Android shadow
-        shadowColor: '#000', // for iOS shadow
+        elevation: 4,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
@@ -397,14 +407,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 30,
         left: 30,
-        width: 60,            // same as squareButton
-        height: 60,           // same as squareButton
+        width: 60,
+        height: 60,
         backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 12,     // same as squareButton
-        elevation: 4,         // shadow Android
-        shadowColor: '#000',  // shadow iOS
+        borderRadius: 12,
+        elevation: 4,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,

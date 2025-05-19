@@ -5,20 +5,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
+// Custom checkbox component
 const CustomCheckBox = ({ value, onValueChange }) => (
     <TouchableOpacity
         onPress={() => onValueChange(!value)}
-        style={{
-            width: 24,
-            height: 24,
-            borderWidth: 2,
-            borderColor: '#007AFF',
-            borderRadius: 4,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: value ? '#007AFF' : 'white',
-        }}
+        style={styles.customCheckBox}
     >
         {value ? (
             <Text style={{ color: 'white', fontWeight: 'bold' }}>✓</Text>
@@ -33,6 +24,7 @@ const Users = () => {
 
     const [activeTab, setActiveTab] = useState('register'); // 'register' or 'login'
 
+    // Registration form state
     const [name, setName] = useState('');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -44,6 +36,7 @@ const Users = () => {
     const [loginUsername, setLoginUsername] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
 
+    // Initialize database and check login status
     const initialize = async () => {
         dbRef.current = await SQLite.openDatabaseAsync("mobileApps.db");
         await setupDatabase();
@@ -55,14 +48,15 @@ const Users = () => {
         initialize();
     }, []);
 
+    // Check if user is already logged in
     const checkLogin = async () => {
         const user = await AsyncStorage.getItem('loggedInUser');
         if (user) {
-            // Navigate to your main screen
             router.push('/screens/products');
         }
     };
 
+    // Create all necessary tables if they do not exist
     const setupDatabase = async () => {
         const db = dbRef.current;
         await db.runAsync(
@@ -116,6 +110,7 @@ const Users = () => {
         setDbReady(true);
     };
 
+    // Reset registration form fields
     const resetRegisterForm = () => {
         setName('');
         setUsername('');
@@ -124,16 +119,19 @@ const Users = () => {
         setConfirmPassword('');
     };
 
+    // Reset login form fields
     const resetLoginForm = () => {
         setLoginUsername('');
         setLoginPassword('');
     };
 
+    // Validate email format
     const validateEmail = (email) => {
         const re = /\S+@\S+\.\S+/;
         return re.test(email);
     };
 
+    // Handle user registration
     const addUser = async () => {
         if (!dbReady) {
             Alert.alert('Please try again in a moment or restart the application.');
@@ -196,6 +194,7 @@ const Users = () => {
         }
     };
 
+    // Handle user login
     const loginUser = async () => {
         if (!dbReady) {
             Alert.alert('Please try again in a moment or restart the application.');
@@ -224,8 +223,7 @@ const Users = () => {
                     await AsyncStorage.removeItem('loggedInUser');
                 }
 
-                // Navigate to your desired screen
-                router.push('/screens/products');  // adjust path as needed
+                router.push('/screens/products');
             } else {
                 Alert.alert('Invalid username or password');
             }
@@ -235,6 +233,7 @@ const Users = () => {
         }
     };
 
+    // Show loading screen while database is initializing
     if (!dbReady) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f2f2f2' }}>
@@ -246,7 +245,7 @@ const Users = () => {
         );
     }
 
-
+    // Main UI rendering
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
@@ -313,10 +312,10 @@ const Users = () => {
                         <TouchableOpacity
                             style={[
                                 styles.registerButton,
-                                !dbReady && { backgroundColor: '#aaa' } // visually indicate disabled
+                                !dbReady && { backgroundColor: '#aaa' }
                             ]}
                             onPress={addUser}
-                            disabled={!dbReady} // <-- disable if db not ready
+                            disabled={!dbReady}
                         >
                             <Text style={styles.registerButtonText}>Register</Text>
                         </TouchableOpacity>
@@ -430,5 +429,15 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    customCheckBox: {
+        width: 24,
+        height: 24,
+        borderWidth: 2,
+        borderColor: '#007AFF',
+        borderRadius: 4,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: value ? '#007AFF' : 'white',
     },
 });

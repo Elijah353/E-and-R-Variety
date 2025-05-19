@@ -14,6 +14,7 @@ const OrderSummary = () => {
     const [refreshing, setRefreshing] = useState(false);
     const router = useRouter();
 
+    // Initialize database and fetch orders
     useEffect(() => {
         const init = async () => {
             dbRef.current = await SQLite.openDatabaseAsync("mobileApps.db");
@@ -24,17 +25,16 @@ const OrderSummary = () => {
         init();
     }, []);
 
-
-    // Refresh handler
+    // Refresh handler for orders list
     const onRefresh = () => {
         setRefreshing(true);
-        // Simulate a network request
         setTimeout(() => {
             setupDatabase().then(fetchOrders);
             setRefreshing(false);
         }, 1000);
     };
 
+    // Handle user logout
     const handleLogout = async () => {
         Alert.alert("Logout", "Are you sure you want to logout?", [
             { text: "Cancel", style: "cancel" },
@@ -49,6 +49,7 @@ const OrderSummary = () => {
         ]);
     };
 
+    // Create all necessary tables if they do not exist
     const setupDatabase = async () => {
         const db = dbRef.current;
         await db.runAsync(
@@ -102,7 +103,7 @@ const OrderSummary = () => {
         setDbReady(true);
     };
 
-    // Fetch all orders
+    // Fetch all orders from the database
     const fetchOrders = async () => {
         if (!dbReady) {
             Alert.alert('Please try again in a moment or restart the application.');
@@ -148,6 +149,7 @@ const OrderSummary = () => {
         fetchOrderDetails(order.id);
     };
 
+    // Parse SQLite date string to local format
     function parseSQLiteDateToLocal(dateString) {
         if (!dateString) return '';
         const isoString = dateString.replace(' ', 'T') + 'Z';
@@ -197,10 +199,10 @@ const OrderSummary = () => {
         </View>
     );
 
-
+    // Main UI rendering
     return (
         <ImageBackground
-            source={require('../assets/background5.jpg')} // Update the path to your image
+            source={require('../assets/background5.jpg')}
             style={styles.background}
         >
             <SafeAreaView style={styles.container}>
@@ -297,14 +299,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 30,
         left: 30,
-        width: 60,            // same as squareButton
-        height: 60,           // same as squareButton
+        width: 60,
+        height: 60,
         backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 12,     // same as squareButton
-        elevation: 4,         // shadow Android
-        shadowColor: '#000',  // shadow iOS
+        borderRadius: 12,
+        elevation: 4,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,

@@ -7,8 +7,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-
 const products = () => {
     const dbRef = useRef(null);
     const [dbReady, setDbReady] = useState(false);
@@ -22,6 +20,7 @@ const products = () => {
     const [refreshing, setRefreshing] = useState(false);
     const router = useRouter();
 
+    // Initialize database and fetch products
     useEffect(() => {
         const init = async () => {
             dbRef.current = await SQLite.openDatabaseAsync("mobileApps.db");
@@ -32,16 +31,16 @@ const products = () => {
         init();
     }, []);
 
-    // Refresh handler
+    // Refresh handler for products list
     const onRefresh = () => {
         setRefreshing(true);
-        // Simulate a network request
         setTimeout(() => {
             setupDatabase().then(fetchProducts);
             setRefreshing(false);
         }, 1000);
     };
 
+    // Handle user logout
     const handleLogout = async () => {
         Alert.alert("Logout", "Are you sure you want to logout?", [
             { text: "Cancel", style: "cancel" },
@@ -56,6 +55,7 @@ const products = () => {
         ]);
     };
 
+    // Create all necessary tables if they do not exist
     const setupDatabase = async () => {
         const db = dbRef.current;
         await db.runAsync(
@@ -109,6 +109,7 @@ const products = () => {
         setDbReady(true);
     };
 
+    // Fetch all products from the database
     const fetchProducts = async () => {
         if (!dbReady) {
             Alert.alert('Please try again in a moment or restart the application.');
@@ -119,6 +120,7 @@ const products = () => {
         setProducts(allRows);
     };
 
+    // Add a new product to the database
     const addProduct = async () => {
         if (!dbReady) {
             Alert.alert('Please try again in a moment or restart the application.');
@@ -129,7 +131,7 @@ const products = () => {
                 const db = dbRef.current;
                 await db.runAsync(
                     "INSERT INTO products (name, price, image) VALUES (?, ?, ?)",
-                    [productName, parseFloat(productPrice), productImage || null] // Allow null image
+                    [productName, parseFloat(productPrice), productImage || null]
                 );
                 setProductName('');
                 setProductPrice('');
@@ -142,10 +144,11 @@ const products = () => {
                 Alert.alert("Error adding product");
             }
         } else {
-            Alert.alert("Please enter a product name and price."); // Updated message
+            Alert.alert("Please enter a product name and price.");
         }
     };
 
+    // Update an existing product in the database
     const updateProduct = async () => {
         if (!dbReady) {
             Alert.alert('Please try again in a moment or restart the application.');
@@ -167,6 +170,7 @@ const products = () => {
         }
     };
 
+    // Delete a product from the database
     const deleteProduct = async (id) => {
         if (!dbReady) {
             Alert.alert('Please try again in a moment or restart the application.');
@@ -182,6 +186,7 @@ const products = () => {
         }
     };
 
+    // Reset form fields and state
     const resetForm = () => {
         setProductName('');
         setProductPrice('');
@@ -191,14 +196,13 @@ const products = () => {
         setSelectedProduct(null);
     };
 
+    // Pick an image from the device library
     const pickImage = async () => {
-        // Ask for permission
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
             Alert.alert('Permission denied', 'We need camera roll permissions to select an image.');
             return;
         }
-        // Launch image picker
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -214,7 +218,7 @@ const products = () => {
     if (showAddForm) {
         return (
             <ImageBackground
-                source={require('../assets/background5.jpg')} // Update the path to your image
+                source={require('../assets/background5.jpg')}
                 style={styles.background}
             >
                 <SafeAreaView style={styles.container}>
@@ -251,7 +255,7 @@ const products = () => {
     if (showEditForm) {
         return (
             <ImageBackground
-                source={require('../assets/background5.jpg')} // Update the path to your image
+                source={require('../assets/background5.jpg')}
                 style={styles.background}
             >
                 <SafeAreaView style={styles.container}>
@@ -285,6 +289,7 @@ const products = () => {
         );
     }
 
+    // Render swipeable delete action for each product
     const renderRightActions = (item) => (
         <TouchableOpacity
             style={styles.deleteIconContainer}
@@ -298,6 +303,7 @@ const products = () => {
         </TouchableOpacity>
     );
 
+    // Render each product item
     const renderItem = ({ item }) => (
         <Swipeable renderRightActions={() => renderRightActions(item)}>
             <TouchableOpacity onPress={() => {
@@ -312,7 +318,7 @@ const products = () => {
                         source={
                             item.image
                                 ? { uri: item.image }
-                                : require('../assets/default-product.png') // <-- Default image
+                                : require('../assets/default-product.png')
                         }
                         style={styles.productImage}
                     />
@@ -325,10 +331,11 @@ const products = () => {
         </Swipeable>
     );
 
+    // Main UI rendering
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <ImageBackground
-                source={require('../assets/background5.jpg')} // Update the path to your image
+                source={require('../assets/background5.jpg')}
                 style={styles.background}
             >
                 <SafeAreaView style={styles.overlay}>
@@ -336,7 +343,6 @@ const products = () => {
                         data={products}
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={renderItem}
-                        // Add Pull-to-Refresh
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
@@ -362,9 +368,8 @@ const products = () => {
             </ImageBackground>
         </GestureHandlerRootView>
     );
-
-
 };
+
 export default products;
 
 const styles = StyleSheet.create({
@@ -407,15 +412,15 @@ const styles = StyleSheet.create({
     squareButton: {
         position: 'absolute',
         bottom: 30,
-        right: 30, // <-- Move button to the right
+        right: 30,
         width: 60,
         height: 60,
         backgroundColor: '#007AFF',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 12,
-        elevation: 4, // for Android shadow
-        shadowColor: '#000', // for iOS shadow
+        elevation: 4,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
@@ -453,14 +458,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 30,
         left: 30,
-        width: 60,            // same as squareButton
-        height: 60,           // same as squareButton
+        width: 60,
+        height: 60,
         backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 12,     // same as squareButton
-        elevation: 4,         // shadow Android
-        shadowColor: '#000',  // shadow iOS
+        borderRadius: 12,
+        elevation: 4,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
@@ -474,5 +479,4 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 20,
     },
-
 });
