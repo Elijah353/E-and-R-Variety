@@ -233,6 +233,15 @@ const Users = () => {
         }
     };
 
+    if (!dbReady) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f2f2f2' }}>
+                <Text style={{ fontSize: 18, color: '#007AFF' }}>Preparing app...</Text>
+            </View>
+        );
+    }
+
+
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
