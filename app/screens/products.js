@@ -61,17 +61,55 @@ const products = () => {
 
     const setupDatabase = async () => {
         const db = await SQLite.openDatabaseAsync("mobileApps.db");
-        // await db.runAsync(
-        //     `DROP TABLE IF EXISTS products`
-        // )
+        // await db.runAsync(`DROP TABLE IF EXISTS users`);  // remove for production
+        await db.runAsync(
+            `CREATE TABLE IF NOT EXISTS users (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT NOT NULL,
+                        username TEXT NOT NULL,
+                        email TEXT NOT NULL,
+                        password TEXT NOT NULL
+                    )`
+        );
+
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            price REAL NOT NULL,
-            image TEXT
-        )`
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    price REAL NOT NULL,
+                    image TEXT
+                )`
         );
+
+        await db.runAsync(
+            `CREATE TABLE IF NOT EXISTS customers (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    username TEXT NOT NULL,
+                    email TEXT NOT NULL
+                )`
+        );
+
+        await db.runAsync(`
+                    CREATE TABLE IF NOT EXISTS orders (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        customer_id INTEGER NOT NULL,
+                        total_price REAL NOT NULL,
+                        order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (customer_id) REFERENCES customers(id)
+                    )
+                `);
+
+        await db.runAsync(`
+                    CREATE TABLE IF NOT EXISTS order_items (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        order_id INTEGER NOT NULL,
+                        product_id INTEGER NOT NULL,
+                        quantity INTEGER DEFAULT 1,
+                        FOREIGN KEY (order_id) REFERENCES orders(id),
+                        FOREIGN KEY (product_id) REFERENCES products(id)
+                    )
+                `);
     };
 
     const fetchProducts = async () => {

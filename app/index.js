@@ -1,9 +1,61 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, ImageBackground, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as SQLite from 'expo-sqlite';
 
 const Welcome = () => {
   const router = useRouter();
+
+  useEffect(() => {
+    const setupDatabase = async () => {
+      const db = await SQLite.openDatabaseAsync("mobileApps.db");
+      await db.runAsync(`
+        CREATE TABLE IF NOT EXISTS users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          username TEXT NOT NULL,
+          email TEXT NOT NULL,
+          password TEXT NOT NULL
+        )
+      `);
+      await db.runAsync(`
+        CREATE TABLE IF NOT EXISTS products (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          price REAL NOT NULL,
+          image TEXT
+        )
+      `);
+      await db.runAsync(`
+        CREATE TABLE IF NOT EXISTS customers (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          username TEXT NOT NULL,
+          email TEXT NOT NULL
+        )
+      `);
+      await db.runAsync(`
+        CREATE TABLE IF NOT EXISTS orders (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          customer_id INTEGER NOT NULL,
+          total_price REAL NOT NULL,
+          order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (customer_id) REFERENCES customers(id)
+        )
+      `);
+      await db.runAsync(`
+        CREATE TABLE IF NOT EXISTS order_items (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          order_id INTEGER NOT NULL,
+          product_id INTEGER NOT NULL,
+          quantity INTEGER DEFAULT 1,
+          FOREIGN KEY (order_id) REFERENCES orders(id),
+          FOREIGN KEY (product_id) REFERENCES products(id)
+        )
+      `);
+    };
+    setupDatabase();
+  }, []);
 
   return (
     <ImageBackground
@@ -15,8 +67,8 @@ const Welcome = () => {
       <View style={styles.container}>
         <Text style={styles.title}>Welcome to E&R Variety</Text>
 
-        <TouchableOpacity 
-          style={styles.button} 
+        <TouchableOpacity
+          style={styles.button}
           onPress={() => router.push('/register/register')}
           activeOpacity={0.8}
         >
@@ -50,11 +102,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 50,
     textShadowColor: 'rgba(0,0,0,0.7)',
-    textShadowOffset: {width: 2, height: 2},
+    textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 6,
   },
   button: {
-    backgroundColor: '#1C1C1C', 
+    backgroundColor: '#1C1C1C',
     paddingVertical: 15,
     paddingHorizontal: 50,
     borderRadius: 30,

@@ -48,17 +48,55 @@ const customers = () => {
 
     const setupDatabase = async () => {
         const db = await SQLite.openDatabaseAsync("mobileApps.db");
-        // await db.runAsync(
-        //     `DROP TABLE IF EXISTS customers`
-        // )
+        // await db.runAsync(`DROP TABLE IF EXISTS users`);  // remove for production
+        await db.runAsync(
+            `CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    username TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    password TEXT NOT NULL
+                )`
+        );
+
+        await db.runAsync(
+            `CREATE TABLE IF NOT EXISTS products (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                price REAL NOT NULL,
+                image TEXT
+            )`
+        );
+
         await db.runAsync(
             `CREATE TABLE IF NOT EXISTS customers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            username TEXT NOT NULL,
-            email TEXT NOT NULL
-        )`
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                username TEXT NOT NULL,
+                email TEXT NOT NULL
+            )`
         );
+
+        await db.runAsync(`
+                CREATE TABLE IF NOT EXISTS orders (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    customer_id INTEGER NOT NULL,
+                    total_price REAL NOT NULL,
+                    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (customer_id) REFERENCES customers(id)
+                )
+            `);
+
+        await db.runAsync(`
+                CREATE TABLE IF NOT EXISTS order_items (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    order_id INTEGER NOT NULL,
+                    product_id INTEGER NOT NULL,
+                    quantity INTEGER DEFAULT 1,
+                    FOREIGN KEY (order_id) REFERENCES orders(id),
+                    FOREIGN KEY (product_id) REFERENCES products(id)
+                )
+            `);
     };
 
     const fetchCustomers = async () => {
@@ -245,21 +283,21 @@ const customers = () => {
                                 refreshing={refreshing}
                                 onRefresh={onRefresh}
                             />
-                        } 
-                        contentContainerStyle={{ paddingBottom: 100 }} 
+                        }
+                        contentContainerStyle={{ paddingBottom: 100 }}
                     />
-            
+
                 </SafeAreaView>
                 {/* Logout button fixed at bottom left */}
                 <TouchableOpacity
-                        style={styles.logoutButton}
-                        onPress={handleLogout}
-                    >
-                        <MaterialIcons name="logout" size={28} color="#007AFF" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.squareButton} onPress={() => { resetForm(); setShowAddForm(true); }}>
-                        <Text style={styles.squareButtonText}>+</Text>
-                    </TouchableOpacity>
+                    style={styles.logoutButton}
+                    onPress={handleLogout}
+                >
+                    <MaterialIcons name="logout" size={28} color="#007AFF" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.squareButton} onPress={() => { resetForm(); setShowAddForm(true); }}>
+                    <Text style={styles.squareButtonText}>+</Text>
+                </TouchableOpacity>
             </ImageBackground>
         </GestureHandlerRootView>
     );
