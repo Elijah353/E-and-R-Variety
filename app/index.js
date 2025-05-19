@@ -7,7 +7,10 @@ const Welcome = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const setupDatabase = async () => {
+    setupDatabase();
+  }, []);
+
+  const setupDatabase = async () => {
       const db = await SQLite.openDatabaseAsync("mobileApps.db");
       await db.runAsync(`
         CREATE TABLE IF NOT EXISTS users (
@@ -54,8 +57,6 @@ const Welcome = () => {
         )
       `);
     };
-    setupDatabase();
-  }, []);
 
   return (
     <ImageBackground

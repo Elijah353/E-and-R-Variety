@@ -44,13 +44,14 @@ const Users = () => {
     const [dbReady, setDbReady] = useState(false);
 
     useEffect(() => {
-        const initialize = async () => {
+        initialize();
+    }, []);
+
+    const initialize = async () => {
             await setupDatabase();
             setDbReady(true);
             checkLogin();
         };
-        initialize();
-    }, []);
 
     const checkLogin = async () => {
         const user = await AsyncStorage.getItem('loggedInUser');
@@ -237,6 +238,9 @@ const Users = () => {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f2f2f2' }}>
                 <Text style={{ fontSize: 18, color: '#007AFF' }}>Preparing app...</Text>
+                <TouchableOpacity onPress={initialize} style={{ marginTop: 20, padding: 10, backgroundColor: '#007AFF', borderRadius: 8 }}>
+                    <Text style={{ color: 'white' }}>Retry</Text>
+                </TouchableOpacity>
             </View>
         );
     }

@@ -17,8 +17,7 @@ const OrderSummary = () => {
         setRefreshing(true);
         // Simulate a network request
         setTimeout(() => {
-            // Add your logic to refresh products here
-            fetchOrders();  // Example: Fetching the latest products
+            setupDatabase().then(fetchOrders);
             setRefreshing(false);
         }, 1000);
     };

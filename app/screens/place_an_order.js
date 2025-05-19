@@ -17,6 +17,7 @@ const PlaceOrder = () => {
 
     const onRefresh = async () => {
         setRefreshing(true);
+        setupDatabase();
         await fetchCustomers();
         await fetchProducts();
         setRefreshing(false);

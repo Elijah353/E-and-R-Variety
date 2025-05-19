@@ -22,8 +22,7 @@ const customers = () => {
         setRefreshing(true);
         // Simulate a network request
         setTimeout(() => {
-            // Add your logic to refresh products here
-            fetchCustomers();
+            setupDatabase().then(fetchCustomers);
             setRefreshing(false);
         }, 1000);
     };

@@ -35,8 +35,7 @@ const products = () => {
         setRefreshing(true);
         // Simulate a network request
         setTimeout(() => {
-            // Add your logic to refresh products here
-            fetchProducts();  // Example: Fetching the latest products
+            setupDatabase().then(fetchProducts);
             setRefreshing(false);
         }, 1000);
     };
