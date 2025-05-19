@@ -81,12 +81,12 @@ const products = () => {
     };
 
     const addProduct = async () => {
-        if (productName && productPrice && productImage) {
+        if (productName && productPrice) { // Removed productImage check
             try {
                 const db = await SQLite.openDatabaseAsync("mobileApps.db");
                 await db.runAsync(
                     "INSERT INTO products (name, price, image) VALUES (?, ?, ?)",
-                    [productName, parseFloat(productPrice), productImage]
+                    [productName, parseFloat(productPrice), productImage || null] // Allow null image
                 );
                 setProductName('');
                 setProductPrice('');
@@ -99,7 +99,7 @@ const products = () => {
                 Alert.alert("Error adding product", e.message);
             }
         } else {
-            Alert.alert("Please enter a product name, price, and image.");
+            Alert.alert("Please enter a product name and price."); // Updated message
         }
     };
 
@@ -253,7 +253,14 @@ const products = () => {
                 setShowEditForm(true);
             }}>
                 <View style={styles.productContainer}>
-                    <Image source={{ uri: item.image }} style={styles.productImage} />
+                    <Image
+                        source={
+                            item.image
+                                ? { uri: item.image }
+                                : require('../assets/default-product.jpg') // <-- Default image
+                        }
+                        style={styles.productImage}
+                    />
                     <View style={styles.productDetails}>
                         <Text style={styles.productName}>{item.name}</Text>
                         <Text style={styles.productPrice}>${parseFloat(item.price).toFixed(2)}</Text>
@@ -281,22 +288,22 @@ const products = () => {
                                 onRefresh={onRefresh}
                             />
                         }
-                         contentContainerStyle={{ paddingBottom: 100 }}
+                        contentContainerStyle={{ paddingBottom: 100 }}
                     />
                 </SafeAreaView>
                 <TouchableOpacity
-                        style={styles.squareButton}
-                        onPress={() => { resetForm(); setShowAddForm(true); }}
-                    >
-                        <Text style={styles.squareButtonText}>+</Text>
-                    </TouchableOpacity>
+                    style={styles.squareButton}
+                    onPress={() => { resetForm(); setShowAddForm(true); }}
+                >
+                    <Text style={styles.squareButtonText}>+</Text>
+                </TouchableOpacity>
                 {/* Logout button fixed at bottom left */}
-                    <TouchableOpacity
-                        style={styles.logoutButton}
-                        onPress={handleLogout}
-                    >
-                        <MaterialIcons name="logout" size={28} color="#007AFF" />
-                    </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.logoutButton}
+                    onPress={handleLogout}
+                >
+                    <MaterialIcons name="logout" size={28} color="#007AFF" />
+                </TouchableOpacity>
             </ImageBackground>
         </GestureHandlerRootView>
     );

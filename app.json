@@ -4,7 +4,7 @@
     "plugins": [
       "expo-router"
     ],
-    "name": "Mobile-Apps",
+    "name": "E&R Variety",
     "slug": "eandr-variety",
     "extra": {
       "router": {},
