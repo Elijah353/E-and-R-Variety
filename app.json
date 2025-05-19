@@ -6,6 +6,7 @@
     ],
     "name": "E&R Variety",
     "slug": "eandr-variety",
+    "icon": "./assets/icon.png",
     "extra": {
       "router": {},
       "eas": {
