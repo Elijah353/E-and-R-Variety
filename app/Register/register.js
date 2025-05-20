@@ -217,7 +217,7 @@ const Users = () => {
             );
 
             if (result.length > 0) {
-                Alert.alert('Login successful!', `Welcome, ${result[0].name}!`);
+                Alert.alert(`Welcome, ${result[0].name}!`);
                 resetLoginForm();
 
                 if (rememberMe) {
@@ -235,6 +235,18 @@ const Users = () => {
             Alert.alert('Error logging in');
         }
     };
+
+    // Show loading screen while database is initializing
+    if (!dbReady) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f2f2f2' }}>
+                <Text style={{ fontSize: 18, color: '#007AFF' }}>Preparing app...</Text>
+                <TouchableOpacity onPress={initialize} style={{ marginTop: 20, padding: 10, backgroundColor: '#007AFF', borderRadius: 8 }}>
+                    <Text style={{ color: 'white' }}>Retry</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
 
     // Main UI rendering
     return (
@@ -353,6 +365,7 @@ const Users = () => {
         </GestureHandlerRootView>
     );
 };
+
 
 export default Users;
 

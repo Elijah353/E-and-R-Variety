@@ -111,10 +111,6 @@ const products = () => {
 
     // Fetch all products from the database
     const fetchProducts = async () => {
-        if (!dbReady) {
-            Alert.alert('Please try again in a moment or refresh the page.');
-            return;
-        }
         const db = dbRef.current;
         const allRows = await db.getAllAsync("SELECT * FROM products");
         setProducts(allRows);
@@ -138,7 +134,6 @@ const products = () => {
                 setProductImage('');
                 setShowAddForm(false);
                 fetchProducts();
-                Alert.alert("Product added!");
             } catch (e) {
                 console.log('DB error:', e);
                 Alert.alert("Error adding product");
@@ -163,7 +158,6 @@ const products = () => {
                 );
                 setShowEditForm(false);
                 fetchProducts();
-                Alert.alert("Product updated!");
             } catch (e) {
                 Alert.alert("Error updating product");
             }
@@ -180,7 +174,6 @@ const products = () => {
             const db = dbRef.current;
             await db.runAsync("DELETE FROM products WHERE id = ?", [id]);
             fetchProducts();
-            Alert.alert("Product deleted!");
         } catch (e) {
             Alert.alert("Error deleting product");
         }
@@ -349,6 +342,7 @@ const products = () => {
                                 onRefresh={onRefresh}
                             />
                         }
+                        ListEmptyComponent={<Text>No products found.</Text>}
                         contentContainerStyle={{ paddingBottom: 100 }}
                     />
                 </SafeAreaView>

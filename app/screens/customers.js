@@ -110,10 +110,6 @@ const customers = () => {
 
     // Fetch all customers from the database
     const fetchCustomers = async () => {
-        if (!dbReady) {
-            Alert.alert('Please try again in a moment or refresh the page.');
-            return;
-        }
         const db = dbRef.current;
         const allRows = await db.getAllAsync("SELECT * FROM customers");
         setCustomers(allRows);
@@ -137,7 +133,6 @@ const customers = () => {
                 setEmail('');
                 setShowAddForm(false);
                 fetchCustomers();
-                Alert.alert("Customer added!");
             } catch (e) {
                 console.log('DB error:', e);
                 Alert.alert("Error adding customer");
@@ -162,7 +157,6 @@ const customers = () => {
                 );
                 setShowEditForm(false);
                 fetchCustomers();
-                Alert.alert("Customer updated!");
             } catch (e) {
                 Alert.alert("Error updating customer");
             }
@@ -179,7 +173,6 @@ const customers = () => {
             const db = dbRef.current;
             await db.runAsync("DELETE FROM customers WHERE id = ?", [id]);
             fetchCustomers();
-            Alert.alert("Customer deleted!");
         } catch (e) {
             Alert.alert("Error deleting Customer");
         }
@@ -317,6 +310,7 @@ const customers = () => {
                                 onRefresh={onRefresh}
                             />
                         }
+                        ListEmptyComponent={<Text>No customers found.</Text>}
                         contentContainerStyle={{ paddingBottom: 100 }}
                     />
 
