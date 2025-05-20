@@ -112,7 +112,7 @@ const products = () => {
     // Fetch all products from the database
     const fetchProducts = async () => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         const db = dbRef.current;
@@ -123,7 +123,7 @@ const products = () => {
     // Add a new product to the database
     const addProduct = async () => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         if (productName && productPrice) {
@@ -151,7 +151,7 @@ const products = () => {
     // Update an existing product in the database
     const updateProduct = async () => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         if (selectedProduct) {
@@ -173,7 +173,7 @@ const products = () => {
     // Delete a product from the database
     const deleteProduct = async (id) => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         try {

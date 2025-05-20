@@ -9,7 +9,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const CustomCheckBox = ({ value, onValueChange }) => (
     <TouchableOpacity
         onPress={() => onValueChange(!value)}
-        style={styles.customCheckBox}
+        style={[
+            styles.customCheckBox,
+            { backgroundColor: value ? '#007AFF' : 'white' }
+        ]}
     >
         {value ? (
             <Text style={{ color: 'white', fontWeight: 'bold' }}>✓</Text>
@@ -134,7 +137,7 @@ const Users = () => {
     // Handle user registration
     const addUser = async () => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         if (!name || !username || !email || !password || !confirmPassword) {
@@ -197,7 +200,7 @@ const Users = () => {
     // Handle user login
     const loginUser = async () => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         if (!loginUsername || !loginPassword) {
@@ -214,7 +217,7 @@ const Users = () => {
             );
 
             if (result.length > 0) {
-                Alert.alert('Login successful!', `Welcome back, ${result[0].name}!`);
+                Alert.alert('Login successful!', `Welcome, ${result[0].name}!`);
                 resetLoginForm();
 
                 if (rememberMe) {
@@ -232,18 +235,6 @@ const Users = () => {
             Alert.alert('Error logging in');
         }
     };
-
-    // Show loading screen while database is initializing
-    if (!dbReady) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f2f2f2' }}>
-                <Text style={{ fontSize: 18, color: '#007AFF' }}>Preparing app...</Text>
-                <TouchableOpacity onPress={initialize} style={{ marginTop: 20, padding: 10, backgroundColor: '#007AFF', borderRadius: 8 }}>
-                    <Text style={{ color: 'white' }}>Retry</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
 
     // Main UI rendering
     return (
@@ -438,6 +429,5 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: value ? '#007AFF' : 'white',
     },
 });

@@ -110,7 +110,7 @@ const PlaceOrder = () => {
     // Fetch customers from the database
     const fetchCustomers = async () => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         try {
@@ -125,7 +125,7 @@ const PlaceOrder = () => {
     // Fetch products from the database
     const fetchProducts = async () => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         try {
@@ -166,8 +166,8 @@ const PlaceOrder = () => {
 
     // Save the order to the database
     const saveOrder = async () => {
-        if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+        if(!dbReady) {
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         if (!selectedCustomer) {

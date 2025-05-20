@@ -111,7 +111,7 @@ const customers = () => {
     // Fetch all customers from the database
     const fetchCustomers = async () => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         const db = dbRef.current;
@@ -122,7 +122,7 @@ const customers = () => {
     // Add a new customer to the database
     const addCustomer = async () => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         if (customerName && username && email) {
@@ -150,7 +150,7 @@ const customers = () => {
     // Update an existing customer in the database
     const updateCustomer = async () => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         if (selectedCustomer) {
@@ -172,7 +172,7 @@ const customers = () => {
     // Delete a customer from the database
     const deleteCustomer = async (id) => {
         if (!dbReady) {
-            Alert.alert('Please try again in a moment or restart the application.');
+            Alert.alert('Please try again in a moment or refresh the page.');
             return;
         }
         try {
